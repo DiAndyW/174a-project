@@ -4,7 +4,7 @@ import * as THREE from 'three';
 import { initScene } from './scene.js';
 import { initUI } from './ui.js';
 import { initWalls } from './walls.js';
-import { loadCones } from './objects.js';
+import { loadCones, loadPlayerHand } from './objects.js';
 import { spawnBalloon, updateBalloons, getBalloons, removeBalloon } from './balloons.js';
 import { shootProjectile, updateProjectiles, getProjectiles, removeProjectile } from './projectiles.js';
 import { initControls } from './controls.js';
@@ -34,6 +34,7 @@ const { updateMovement, cleanup: controlsCleanup } = initControls(camera, render
 
 // Load 3D objects
 loadCones(scene);
+loadPlayerHand(camera);
 
 // Spawn initial balloon
 spawnBalloon(scene);

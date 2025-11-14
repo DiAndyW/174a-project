@@ -1,4 +1,4 @@
-// objects.js - Loading 3D objects (cones)
+// objects.js - Loading 3D objects (cones, dart gun)
 import * as THREE from 'three';
 import { OBJLoader } from 'three/addons/loaders/OBJLoader.js';
 
@@ -45,4 +45,46 @@ export function loadCones(scene) {
             }
         );
     });
+}
+
+export function loadPlayerHand(camera) {
+    const objLoader = new OBJLoader();
+
+    // Hand Material
+    const Material = new THREE.MeshPhongMaterial({
+        color: 0xb35432,
+    });
+
+    objLoader.load(
+        '../models/hand.obj',
+        function (object) {
+            // Scale and position for first-person view
+            object.scale.set(0.1, 0.1, 0.1);
+
+            // Position in front of camera
+            object.position.set(0.15, -0.3, -0.62);
+
+            // Rotate to point forward 
+            object.rotation.set(0, Math.PI*3/2, 0);
+
+            // Apply material to all meshes
+            object.traverse((child) => {
+                if (child.isMesh) {
+                    // Don't cast shadows for the player's hand to avoid blocking view
+                    child.castShadow = false;
+                    child.material = Material;
+                    child.receiveShadow = false;
+                }
+            });
+
+            // Add to camera so it moves with player view
+            camera.add(object);
+        },
+        function (xhr) {
+            console.log(`Player hand: ${(xhr.loaded / xhr.total * 100)}% loaded`);
+        },
+        function (error) {
+            console.error('Error loading player hand:', error);
+        }
+    );
 }
