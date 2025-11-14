@@ -2,6 +2,7 @@
 import './index.css';
 import * as THREE from 'three';
 import { PointerLockControls } from 'three/examples/jsm/controls/PointerLockControls.js';
+import { OBJLoader } from 'three/addons/loaders/OBJLoader.js';
 
 // Root container
 const root = document.getElementById('root');
@@ -19,6 +20,49 @@ container.style.position = 'relative';
 container.style.overflow = 'hidden';
 container.style.backgroundColor = 'black';
 root.appendChild(container);
+
+const objLoader = new OBJLoader();
+
+// Orange material for cones
+const orangeMaterial = new THREE.MeshPhongMaterial({
+    color: 0xFF8C00,
+    shininess: 30
+});
+
+const conePositions = [
+    { x: -2.2, z: 7.8 },   
+    { x: -2.2, z: 9.3 },    
+    { x: 2.2, z: 7.8 },
+    { x: 2.2, z: 9.3 },      
+];
+
+conePositions.forEach((pos, index) => {
+    objLoader.load(
+        '../models/cone.obj',
+        function (object) {
+            // Apply transformations
+            object.scale.set(0.5, 0.5, 0.5);
+            object.position.set(pos.x, 0, pos.z);
+
+            // Apply orange material to all meshes in the object
+            object.traverse((child) => {
+                if (child.isMesh) {
+                    child.material = orangeMaterial;
+                    child.castShadow = true;
+                    child.receiveShadow = true;
+                }
+            });
+
+            scene.add(object);
+        },
+        function (xhr) {
+            console.log(`Cone ${index + 1}: ${(xhr.loaded / xhr.total * 100)}% loaded`);
+        },
+        function (error) {
+            console.error(`Error loading cone ${index + 1}:`, error);
+        }
+    );
+});
 
 // --- Overlays: crosshair, score, hint ---
 
@@ -121,6 +165,113 @@ const ground = new THREE.Mesh(groundGeo, groundMat);
 ground.rotation.x = -Math.PI / 2;
 ground.receiveShadow = true;
 scene.add(ground);
+
+// --- STARTING AREA WITH WALLS AND WINDOW ---
+const wallMaterial = new THREE.MeshPhongMaterial({
+    color: 0x8B4513,
+    side: THREE.DoubleSide
+});
+const wallHeight = 3;
+const wallThickness = 0.2;
+const roomWidth = 6;
+const roomDepth = 6;
+const roomCenterZ = 10;
+
+// Array to store walls for collision detection
+const walls = [];
+
+// Back wall (behind player)
+const backWall = new THREE.Mesh(
+    new THREE.BoxGeometry(roomWidth, wallHeight, wallThickness),
+    wallMaterial
+);
+backWall.position.set(0, wallHeight / 2, roomCenterZ + roomDepth / 2);
+backWall.castShadow = true;
+backWall.receiveShadow = true;
+scene.add(backWall);
+walls.push(backWall);
+
+// Left wall
+const leftWall = new THREE.Mesh(
+    new THREE.BoxGeometry(wallThickness, wallHeight, roomDepth),
+    wallMaterial
+);
+leftWall.position.set(-roomWidth / 2, wallHeight / 2, roomCenterZ);
+leftWall.castShadow = true;
+leftWall.receiveShadow = true;
+scene.add(leftWall);
+walls.push(leftWall);
+
+// Right wall
+const rightWall = new THREE.Mesh(
+    new THREE.BoxGeometry(wallThickness, wallHeight, roomDepth),
+    wallMaterial
+);
+rightWall.position.set(roomWidth / 2, wallHeight / 2, roomCenterZ);
+rightWall.castShadow = true;
+rightWall.receiveShadow = true;
+scene.add(rightWall);
+walls.push(rightWall);
+
+// Front wall - left section (next to window)
+const windowWidth = 3;
+const frontLeftWall = new THREE.Mesh(
+    new THREE.BoxGeometry((roomWidth - windowWidth) / 2, wallHeight, wallThickness),
+    wallMaterial
+);
+frontLeftWall.position.set(-roomWidth / 2 + (roomWidth - windowWidth) / 4, wallHeight / 2, roomCenterZ - roomDepth / 2);
+frontLeftWall.castShadow = true;
+frontLeftWall.receiveShadow = true;
+scene.add(frontLeftWall);
+walls.push(frontLeftWall);
+
+// Front wall - right section (next to window)
+const frontRightWall = new THREE.Mesh(
+    new THREE.BoxGeometry((roomWidth - windowWidth) / 2, wallHeight, wallThickness),
+    wallMaterial
+);
+frontRightWall.position.set(roomWidth / 2 - (roomWidth - windowWidth) / 4, wallHeight / 2, roomCenterZ - roomDepth / 2);
+frontRightWall.castShadow = true;
+frontRightWall.receiveShadow = true;
+scene.add(frontRightWall);
+walls.push(frontRightWall);
+
+// Window frame top
+const windowTop = new THREE.Mesh(
+    new THREE.BoxGeometry(windowWidth, 0.5, wallThickness),
+    wallMaterial
+);
+windowTop.position.set(0, wallHeight - 0.25, roomCenterZ - roomDepth / 2);
+windowTop.castShadow = true;
+windowTop.receiveShadow = true;
+scene.add(windowTop);
+walls.push(windowTop);
+
+// Window sill bottom
+const windowBottom = new THREE.Mesh(
+    new THREE.BoxGeometry(windowWidth, 0.8, wallThickness),
+    wallMaterial
+);
+windowBottom.position.set(0, 0.4, roomCenterZ - roomDepth / 2);
+windowBottom.castShadow = true;
+windowBottom.receiveShadow = true;
+scene.add(windowBottom);
+walls.push(windowBottom);
+
+// Helper function to check collision with walls
+function checkWallCollision(position, radius = 0.5) {
+    // Check collision at ground level (player's body), not camera height
+    const bodyPosition = new THREE.Vector3(position.x, 1.0, position.z);
+
+    for (const wall of walls) {
+        const wallBox = new THREE.Box3().setFromObject(wall);
+        const playerSphere = new THREE.Sphere(bodyPosition, radius);
+        if (wallBox.intersectsSphere(playerSphere)) {
+            return true;
+        }
+    }
+    return false;
+}
 
 // Pointer lock controls
 const controls = new PointerLockControls(camera, renderer.domElement);
@@ -286,11 +437,19 @@ function animate() {
     const dt = clock.getDelta();
 
     if (controls.isLocked) {
+        // Store previous position
+        const prevPosition = camera.position.clone();
+
         const actualMove = moveSpeed * dt;
         if (moveForward) controls.moveForward(actualMove);
         if (moveBackward) controls.moveForward(-actualMove);
         if (moveLeft) controls.moveRight(-actualMove);
         if (moveRight) controls.moveRight(actualMove);
+
+        // Check collision and revert if needed
+        if (checkWallCollision(camera.position)) {
+            camera.position.copy(prevPosition);
+        }
     }
 
     // projectiles
