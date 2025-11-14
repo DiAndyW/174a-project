@@ -7,7 +7,7 @@ const objLoader = new OBJLoader();
 
 // Balloon body material
 const balloonMaterial = new THREE.MeshPhongMaterial({
-    color: 0x2f52d4,  // Red/pink balloon
+    color: 0xff0000,  // Red/pink balloon
     shininess: 80,
     specular: 0x222222,
     flatShading: false,
@@ -28,7 +28,7 @@ function createBalloonMesh(callback) {
         '../models/balloon.obj',
         function (balloonObject) {
             // Apply transformations
-            balloonObject.scale.set(0.5, 0.5, 0.5);
+            balloonObject.scale.set(0.8, 0.8, 0.8);
 
             // Apply balloon material
             balloonObject.traverse((child) => {
@@ -57,11 +57,11 @@ function createBalloonMesh(callback) {
         '../models/string.obj',
         function (stringObject) {
             // Apply transformations
-            stringObject.scale.set(0.5, 0.5, 0.5);
+            stringObject.scale.set(0.7, 0.7, 0.7);
 
             // Position the string below the balloon
             // Adjust these values to align the string properly
-            stringObject.position.set(-0.5, -0.4, 1.5);
+            stringObject.position.set(-0.8, -0.6, 2.4);
 
             // Apply string material
             stringObject.traverse((child) => {
@@ -86,17 +86,21 @@ function createBalloonMesh(callback) {
     );
 }
 
-export function spawnBalloon(scene) {
+export function spawnBalloon(scene, startY = null) {
     createBalloonMesh((balloonMesh) => {
-        balloonMesh.position.set(-5, 2, -10);
+        // Random starting height if not specified
+        const yPos = startY !== null ? startY : 0.5 + Math.random() * 4;
+        balloonMesh.position.set(-5, yPos, -10);
         scene.add(balloonMesh);
 
-        const velocity = new THREE.Vector3(6, 6, 0);
+        // More horizontal velocity, less vertical for floating effect
+        const velocity = new THREE.Vector3(1.5, 0.1, 0);
 
         balloons.push({
             mesh: balloonMesh,
             velocity,
-            radius: 0.5,
+            radius: 1.3, // Increased collision radius for bigger balloon
+            time: Math.random() * Math.PI * 2, // Random phase for arc motion
         });
     });
 }
@@ -106,8 +110,18 @@ export function updateBalloons(scene, dt, gravity) {
 
     for (let i = balloons.length - 1; i >= 0; i--) {
         const b = balloons[i];
-        b.velocity.addScaledVector(gravity, dt);
-        b.mesh.position.addScaledVector(b.velocity, dt);
+
+        // Increment time for arc motion
+        b.time += dt * 0.8;
+
+        // Apply reduced gravity for floating effect
+        b.velocity.addScaledVector(gravity, dt * 0.05);
+
+        // Add sine wave for arc/floating motion
+        const arcOffset = Math.sin(b.time) * 0.3;
+        b.mesh.position.x += b.velocity.x * dt;
+        b.mesh.position.y += (b.velocity.y + arcOffset) * dt;
+        b.mesh.position.z += b.velocity.z * dt;
 
         if (b.mesh.position.y < -2 || b.mesh.position.lengthSq() > 10000) {
             scene.remove(b.mesh);

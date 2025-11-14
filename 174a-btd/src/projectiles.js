@@ -10,11 +10,11 @@ export function shootProjectile(scene, camera) {
     camera.getWorldPosition(origin);
     camera.getWorldDirection(dir);
 
-    const speed = 25;
+    const speed = 50;
     const velocity = dir.multiplyScalar(speed);
 
     const geom = new THREE.SphereGeometry(0.1, 16, 16);
-    const mat = new THREE.MeshPhongMaterial({ color: 0xff4444 });
+    const mat = new THREE.MeshPhongMaterial({ color: 0x000000 });
     const bullet = new THREE.Mesh(geom, mat);
     bullet.castShadow = true;
     bullet.position.copy(origin);
@@ -23,7 +23,7 @@ export function shootProjectile(scene, camera) {
     projectiles.push({
         mesh: bullet,
         velocity,
-        radius: 0.1,
+        radius: 0.3,
     });
 }
 

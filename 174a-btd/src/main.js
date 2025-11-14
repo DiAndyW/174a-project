@@ -36,8 +36,11 @@ const { updateMovement, cleanup: controlsCleanup } = initControls(camera, render
 loadCones(scene);
 loadPlayerHand(camera);
 
-// Spawn initial balloon
-spawnBalloon(scene);
+// Spawn initial balloons at different heights
+const balloonHeights = [0.5, 1.5, 3.4, 5.4, 7];
+balloonHeights.forEach((height, i) => {
+    setTimeout(() => spawnBalloon(scene, height), i * 800);
+});
 
 // Physics constants
 const gravity = new THREE.Vector3(0, -9.8, 0);

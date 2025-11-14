@@ -41,7 +41,7 @@ export function initScene(container) {
 
     // Ground
     const groundGeo = new THREE.PlaneGeometry(100, 100);
-    const groundMat = new THREE.MeshPhongMaterial({ color: 0x1f3d1f });
+    const groundMat = new THREE.MeshPhongMaterial({ color: 0x338c1f});
     const ground = new THREE.Mesh(groundGeo, groundMat);
     ground.rotation.x = -Math.PI / 2;
     ground.receiveShadow = true;
