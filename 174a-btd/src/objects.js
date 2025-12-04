@@ -2,6 +2,8 @@
 import * as THREE from 'three';
 import { OBJLoader } from 'three/addons/loaders/OBJLoader.js';
 
+let currentWeaponModel = null;
+
 export function loadCones(scene) {
     const objLoader = new OBJLoader();
 
@@ -47,6 +49,82 @@ export function loadCones(scene) {
     });
 }
 
+export function loadWeaponModel(camera, weaponConfig) {
+    const objLoader = new OBJLoader();
+
+    // Remove current weapon model if it exists
+    if (currentWeaponModel) {
+        camera.remove(currentWeaponModel);
+        currentWeaponModel.traverse((child) => {
+            if (child.isMesh) {
+                child.geometry.dispose();
+                child.material.dispose();
+            }
+        });
+        currentWeaponModel = null;
+    }
+
+    // Create material based on weapon config
+    let material;
+    if (weaponConfig.modelMaterial.type === 'standard') {
+        material = new THREE.MeshStandardMaterial({
+            color: weaponConfig.modelMaterial.color,
+            metalness: weaponConfig.modelMaterial.metalness || 0,
+            roughness: weaponConfig.modelMaterial.roughness || 0.5,
+        });
+    } else {
+        material = new THREE.MeshPhongMaterial({
+            color: weaponConfig.modelMaterial.color,
+        });
+    }
+
+    objLoader.load(
+        weaponConfig.modelPath,
+        function (object) {
+            // Scale and position for first-person view
+            object.scale.set(
+                weaponConfig.modelScale.x,
+                weaponConfig.modelScale.y,
+                weaponConfig.modelScale.z
+            );
+
+            // Position in front of camera
+            object.position.set(
+                weaponConfig.modelPosition.x,
+                weaponConfig.modelPosition.y,
+                weaponConfig.modelPosition.z
+            );
+
+            // Rotate to point forward
+            object.rotation.set(
+                weaponConfig.modelRotation.x,
+                weaponConfig.modelRotation.y,
+                weaponConfig.modelRotation.z
+            );
+
+            // Apply material to all meshes
+            object.traverse((child) => {
+                if (child.isMesh) {
+                    // Don't cast shadows for the player's weapon to avoid blocking view
+                    child.castShadow = false;
+                    child.material = material;
+                    child.receiveShadow = false;
+                }
+            });
+
+            // Add to camera so it moves with player view
+            camera.add(object);
+            currentWeaponModel = object;
+        },
+        function (xhr) {
+            console.log(`Weapon model (${weaponConfig.name}): ${(xhr.loaded / xhr.total * 100)}% loaded`);
+        },
+        function (error) {
+            console.error(`Error loading weapon model (${weaponConfig.name}):`, error);
+        }
+    );
+}
+
 export function loadPlayerHand(camera) {
     const objLoader = new OBJLoader();
 
@@ -64,7 +142,7 @@ export function loadPlayerHand(camera) {
             // Position in front of camera
             object.position.set(0.15, -0.3, -0.62);
 
-            // Rotate to point forward 
+            // Rotate to point forward
             object.rotation.set(0, Math.PI*3/2, 0);
 
             // Apply material to all meshes

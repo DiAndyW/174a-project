@@ -1,12 +1,13 @@
 // ui.js - Enhanced UI with menus, warnings, and advanced scoring
 import { WEAPONS, setCurrentWeapon, getCurrentWeapon } from './weapons.js';
+import { loadWeaponModel } from './objects.js';
 
 export function initUI(container) {
     let score = 0;
     let highScore = parseInt(localStorage.getItem('btd-highscore') || '0');
     let combo = 0;
     let multiplier = 1;
-    let lives = 5;
+    let lives = 999;
     let gameStarted = false;
     let gamePaused = false;
     let lastHitTime = 0;
@@ -151,6 +152,12 @@ export function initUI(container) {
         card.onclick = () => {
             setCurrentWeapon(weapon.id);
             weaponMenu.style.display = 'none';
+
+            // Load weapon model
+            if (window.gameCamera) {
+                loadWeaponModel(window.gameCamera, weapon);
+            }
+
             startGame();
             if (window.onGameStart) window.onGameStart();
         };
@@ -411,7 +418,7 @@ export function initUI(container) {
         score = 0;
         combo = 0;
         multiplier = 1;
-        lives = 5;
+        lives = 999;
         updateScore();
         updateLives();
         updateWeaponDisplay();

@@ -4,7 +4,7 @@ import * as THREE from 'three';
 import { initScene } from './scene.js';
 import { initUI } from './ui.js';
 import { initWalls } from './walls.js';
-import { loadCones, loadPlayerHand } from './objects.js';
+import { loadCones, loadWeaponModel } from './objects.js';
 import { spawnBalloon, updateBalloons, getBalloons, removeBalloon, setCallbacks } from './balloons.js';
 import { shootProjectile, updateProjectiles, getProjectiles, removeProjectile } from './projectiles.js';
 import { initControls } from './controls.js';
@@ -46,7 +46,9 @@ setCallbacks(
 
 // Load 3D objects
 loadCones(scene);
-loadPlayerHand(camera);
+
+// Expose camera for weapon loading
+window.gameCamera = camera;
 
 // Start-game handler
 window.onGameStart = () => {
