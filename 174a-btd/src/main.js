@@ -114,7 +114,9 @@ function animate() {
                     // Explosion effect
                     createExplosion(scene, tmpB, 0xff0000);
 
-                    addScore(10);
+                    // Use damage for score calculation
+                    const damageMultiplier = p.damage || 1;
+                    addScore(Math.round(10 * damageMultiplier));
                     spawnBalloon(scene);
 
                     break;

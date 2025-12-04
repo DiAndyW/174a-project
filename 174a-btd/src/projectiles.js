@@ -1,10 +1,12 @@
 // projectiles.js - Shooting and projectile management
 import * as THREE from 'three';
+import { getCurrentWeapon } from './weapons.js';
 
 const projectiles = [];
 const raycaster = new THREE.Raycaster();
 
 export function shootProjectile(scene, camera) {
+    const weapon = getCurrentWeapon();
     const origin = new THREE.Vector3();
     const dir = new THREE.Vector3();
 
@@ -12,12 +14,11 @@ export function shootProjectile(scene, camera) {
     camera.getWorldPosition(origin);
     camera.getWorldDirection(dir);
 
-    const speed = 50;
-    const velocity = dir.clone().multiplyScalar(speed);
+    const velocity = dir.clone().multiplyScalar(weapon.projectileSpeed);
 
-    // Projectile mesh
-    const geom = new THREE.SphereGeometry(0.1, 16, 16);
-    const mat = new THREE.MeshPhongMaterial({ color: 0x000000 });
+    // Projectile mesh with weapon properties
+    const geom = new THREE.SphereGeometry(weapon.projectileSize, 16, 16);
+    const mat = new THREE.MeshPhongMaterial({ color: weapon.projectileColor });
     const bullet = new THREE.Mesh(geom, mat);
     bullet.castShadow = true;
     bullet.position.copy(origin);
@@ -26,8 +27,9 @@ export function shootProjectile(scene, camera) {
     projectiles.push({
         mesh: bullet,
         velocity,
-        radius: 0.3,
-        prevPos: origin.clone(),   // Store previous frame position
+        radius: weapon.projectileSize * 3,
+        prevPos: origin.clone(),
+        damage: weapon.damage,  // Store damage with projectile
     });
 }
 
