@@ -67,11 +67,23 @@ export function loadWeaponModel(camera, weaponConfig) {
     // Create material based on weapon config
     let material;
     if (weaponConfig.modelMaterial.type === 'standard') {
-        material = new THREE.MeshStandardMaterial({
+        const matConfig = {
             color: weaponConfig.modelMaterial.color,
             metalness: weaponConfig.modelMaterial.metalness || 0,
             roughness: weaponConfig.modelMaterial.roughness || 0.5,
-        });
+        };
+
+        // Add optional properties
+        if (weaponConfig.modelMaterial.transparent) {
+            matConfig.transparent = true;
+            matConfig.opacity = weaponConfig.modelMaterial.opacity || 1;
+        }
+        if (weaponConfig.modelMaterial.emissive) {
+            matConfig.emissive = weaponConfig.modelMaterial.emissive;
+            matConfig.emissiveIntensity = weaponConfig.modelMaterial.emissiveIntensity || 0;
+        }
+
+        material = new THREE.MeshStandardMaterial(matConfig);
     } else {
         material = new THREE.MeshPhongMaterial({
             color: weaponConfig.modelMaterial.color,
