@@ -60,6 +60,9 @@ export function initScene(container) {
     ground.receiveShadow = true;
     scene.add(ground);
 
+    // Add spawn walls with holes
+    addSpawnWalls(scene);
+
     // Add decorative clouds
     addClouds(scene);
 
@@ -86,6 +89,103 @@ export function initScene(container) {
             window.removeEventListener('resize', onResize);
         }
     };
+}
+
+// Add spawn walls with dark holes
+function addSpawnWalls(scene) {
+    const wallMaterial = new THREE.MeshToonMaterial({
+        color: 0x8B7355,
+        side: THREE.DoubleSide
+    });
+
+    const holeMaterial = new THREE.MeshToonMaterial({
+        color: 0x1a1a1a,
+        side: THREE.BackSide,
+        emissive: 0x000000
+    });
+
+    // Create one large wall with 2 holes at different heights
+    const wallShape = new THREE.Shape();
+    const wallWidth = 50;  // Much wider
+    const wallHeight = 20; // Much taller
+    const holeRadius = 0.8;
+    const holePositions = [
+        { x: 0, y: 2 },    // Lower hole
+        { x: 0, y: 4.5 }   // Upper hole
+    ];
+
+    // Outer rectangle - large wall
+    wallShape.moveTo(-wallWidth/2, -wallHeight/2);
+    wallShape.lineTo(wallWidth/2, -wallHeight/2);
+    wallShape.lineTo(wallWidth/2, wallHeight/2);
+    wallShape.lineTo(-wallWidth/2, wallHeight/2);
+    wallShape.lineTo(-wallWidth/2, -wallHeight/2);
+
+    // Add holes at specific positions
+    holePositions.forEach(pos => {
+        const holePath = new THREE.Path();
+        holePath.absarc(pos.x, pos.y, holeRadius, 0, Math.PI * 2, false);
+        wallShape.holes.push(holePath);
+    });
+
+    const wallGeometry = new THREE.ShapeGeometry(wallShape);
+
+    // Left wall
+    const leftWall = new THREE.Mesh(wallGeometry, wallMaterial);
+    leftWall.castShadow = true;
+    leftWall.receiveShadow = true;
+    leftWall.position.set(-6, 0, -10);
+    leftWall.rotation.y = Math.PI / 2; // Face towards the player
+    scene.add(leftWall);
+
+    // Right wall
+    const rightWall = new THREE.Mesh(wallGeometry, wallMaterial);
+    rightWall.castShadow = true;
+    rightWall.receiveShadow = true;
+    rightWall.position.set(6, 0, -10);
+    rightWall.rotation.y = Math.PI / 2; // Face towards the player
+    scene.add(rightWall);
+
+    // Add dark hole depth for each hole (cylinder to create tunnel effect)
+    // Left side holes
+    holePositions.forEach(pos => {
+        const holeDepth = new THREE.Mesh(
+            new THREE.CylinderGeometry(holeRadius, holeRadius * 1.1, 1.5, 16),
+            holeMaterial
+        );
+        holeDepth.rotation.z = Math.PI / 2;
+        holeDepth.position.set(-6.75, pos.y, -10);
+        scene.add(holeDepth);
+
+        // Add rim around hole for more depth
+        const rimGeometry = new THREE.TorusGeometry(holeRadius, 0.1, 8, 16);
+        const rimMaterial = new THREE.MeshToonMaterial({ color: 0x654321 });
+        const rim = new THREE.Mesh(rimGeometry, rimMaterial);
+        rim.castShadow = true;
+        rim.position.set(-6, pos.y, -10);
+        rim.rotation.y = Math.PI / 2;
+        scene.add(rim);
+    });
+
+    // Right side holes
+    holePositions.forEach(pos => {
+        const holeDepth = new THREE.Mesh(
+            new THREE.CylinderGeometry(holeRadius, holeRadius * 1.1, 1.5, 16),
+            holeMaterial
+        );
+        holeDepth.rotation.z = Math.PI / 2;
+        holeDepth.position.set(6.75, pos.y, -10);
+        scene.add(holeDepth);
+
+        // Add rim around hole for more depth
+        const rimGeometry = new THREE.TorusGeometry(holeRadius, 0.1, 8, 16);
+        const rimMaterial = new THREE.MeshToonMaterial({ color: 0x654321 });
+        const rim = new THREE.Mesh(rimGeometry, rimMaterial);
+        rim.castShadow = true;
+        rim.position.set(6, pos.y, -10);
+        rim.rotation.y = Math.PI / 2;
+        scene.add(rim);
+    });
 }
 
 // Add puffy cartoon clouds

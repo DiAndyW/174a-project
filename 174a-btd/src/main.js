@@ -112,7 +112,8 @@ function animate() {
             const b = balloons[i];
             if (b.isDying) continue; // Skip dying balloons
             
-            b.mesh.getWorldPosition(tmpB);
+            // Use balloon object position instead of full group (excludes string)
+            b.balloonObject.getWorldPosition(tmpB);
 
             // Balloon radius fallback
             let bRadius = b.radius;
