@@ -4,7 +4,7 @@ let gameConfig = {
     gravity: -9.8,
     balloonSize: 1.0, // Multiplier for balloon radius
     spawnDirection: 'random', // 'left', 'right', or 'random'
-    movementPattern: 'random', // 'random', 'NORMAL', 'ZIGZAG', 'SINE', or 'SPIRAL'
+    movementPattern: 'random', // 'random', 'NORMAL', 'ZIGZAG', 'SINE', 'RISE', or 'SPIRAL'
     baseSpeed: 1.5, // Base movement speed for balloons
 };
 

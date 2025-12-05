@@ -180,7 +180,6 @@ function createBalloonMesh(balloonType, callback) {
 
             balloonObject.traverse((child) => {
                 if (child.isMesh) {
-                    // Fix: center geometry so hitbox matches balloon
                     child.geometry.computeBoundingBox();
                     const center = new THREE.Vector3();
                     child.geometry.boundingBox.getCenter(center);
