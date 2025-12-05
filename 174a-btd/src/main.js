@@ -57,7 +57,9 @@ initWaves(
         setTimeout(() => {
             startNextWave();
         }, 2000); // 2 second break between waves
-    }
+    },
+    // Pass isPaused callback so wave system can check pause state
+    isGamePaused
 );
 
 // Callbacks for balloon events

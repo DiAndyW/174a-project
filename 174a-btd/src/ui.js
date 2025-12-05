@@ -290,7 +290,7 @@ export function initUI(container) {
     const controlsInfo = document.createElement('div');
     controlsInfo.innerHTML = `
         <span style="opacity: 0.9;">Hold mouse to shoot</span>
-        <span style="margin: 0 15px; opacity: 0.5;">•</span>
+        <span style="margin: 0 10px; opacity: 0.5;">•</span>
         <span style="opacity: 0.9;">Pop all the balloons!</span>
     `;
     Object.assign(controlsInfo.style, {
