@@ -15,15 +15,15 @@ export function initWalls(scene) {
     const walls = [];
 
     // Back wall (behind player)
-    // const backWall = new THREE.Mesh(
-    //     new THREE.BoxGeometry(roomWidth, wallHeight, wallThickness),
-    //     wallMaterial
-    // );
-    // backWall.position.set(0, wallHeight / 2, roomCenterZ + roomDepth / 2);
-    // backWall.castShadow = true;
-    // backWall.receiveShadow = true;
-    // scene.add(backWall);
-    // walls.push(backWall);
+    const backWall = new THREE.Mesh(
+        new THREE.BoxGeometry(roomWidth, wallHeight, wallThickness),
+        wallMaterial
+    );
+    backWall.position.set(0, wallHeight / 2, roomCenterZ + roomDepth / 2);
+    backWall.castShadow = true;
+    backWall.receiveShadow = true;
+    scene.add(backWall);
+    walls.push(backWall);
 
     // Left wall
     const leftWall = new THREE.Mesh(
