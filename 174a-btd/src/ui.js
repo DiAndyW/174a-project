@@ -14,7 +14,13 @@ export function initUI(container) {
     let currentWaveNum = 0;
     let balloonsRemaining = 0;
 
-    // Main menu - BTD style with wood/brown theme
+    // Add Google Font
+    const fontLink = document.createElement('link');
+    fontLink.href = 'https://fonts.googleapis.com/css2?family=Bangers&family=Fredoka:wght@400;600;700&display=swap';
+    fontLink.rel = 'stylesheet';
+    document.head.appendChild(fontLink);
+
+    // Main menu - Premium BTD style with animated background
     const mainMenu = document.createElement('div');
     Object.assign(mainMenu.style, {
         position: 'absolute',
@@ -22,67 +28,224 @@ export function initUI(container) {
         left: '0',
         width: '100%',
         height: '100%',
-        background: 'linear-gradient(180deg, #4a7c3f 0%, #2d5a27 50%, #1a3d15 100%)',
+        background: `
+            radial-gradient(ellipse at 30% 20%, rgba(120, 200, 80, 0.3) 0%, transparent 50%),
+            radial-gradient(ellipse at 70% 80%, rgba(50, 120, 50, 0.4) 0%, transparent 50%),
+            linear-gradient(180deg, #5a9c4f 0%, #3d7a37 30%, #2d5a27 60%, #1a3d15 100%)
+        `,
         display: 'flex',
         flexDirection: 'column',
         justifyContent: 'center',
         alignItems: 'center',
         zIndex: '1000',
+        overflow: 'hidden',
+    });
+
+    // Decorative floating balloons
+    const createFloatingBalloon = (color, left, delay, size) => {
+        const balloon = document.createElement('div');
+        Object.assign(balloon.style, {
+            position: 'absolute',
+            width: size + 'px',
+            height: (size * 1.2) + 'px',
+            background: `radial-gradient(ellipse at 30% 20%, ${color}ee 0%, ${color}aa 50%, ${color}88 100%)`,
+            borderRadius: '50% 50% 50% 50%',
+            left: left + '%',
+            bottom: '-100px',
+            opacity: '0.6',
+            animation: `floatUp ${8 + Math.random() * 4}s linear infinite`,
+            animationDelay: delay + 's',
+            pointerEvents: 'none',
+            boxShadow: `inset -${size/8}px -${size/8}px ${size/4}px rgba(0,0,0,0.2), inset ${size/10}px ${size/10}px ${size/5}px rgba(255,255,255,0.3)`,
+        });
+        return balloon;
+    };
+    
+    const balloonColors = ['#ff6b6b', '#4ecdc4', '#45b7d1', '#f9ca24', '#6c5ce7', '#a29bfe', '#fd79a8'];
+    for (let i = 0; i < 12; i++) {
+        const balloon = createFloatingBalloon(
+            balloonColors[i % balloonColors.length],
+            Math.random() * 100,
+            Math.random() * 8,
+            30 + Math.random() * 25
+        );
+        mainMenu.appendChild(balloon);
+    }
+
+    // Title container with decorative frame
+    const titleContainer = document.createElement('div');
+    Object.assign(titleContainer.style, {
+        position: 'relative',
+        marginBottom: '20px',
+    });
+
+    const titleBanner = document.createElement('div');
+    Object.assign(titleBanner.style, {
+        background: 'linear-gradient(180deg, #c4943a 0%, #a67c30 20%, #8B6914 50%, #6B4F0E 100%)',
+        padding: '25px 50px',
+        borderRadius: '15px',
+        border: '5px solid #5D4E37',
+        boxShadow: '0 8px 0px #3d2e1e, 0 12px 30px rgba(0,0,0,0.5), inset 0 2px 0 rgba(255,255,255,0.2)',
+        position: 'relative',
     });
 
     const title = document.createElement('div');
-    title.textContent = 'BLOONS TOWER DEFENSE';
+    title.textContent = 'BLOONS TOWER';
     Object.assign(title.style, {
-        fontSize: '48px',
-        color: '#ffd700',
+        fontSize: '52px',
+        color: '#ffeaa0',
         fontWeight: 'bold',
-        marginBottom: '30px',
-        textShadow: '3px 3px 0px #8B4513, 5px 5px 8px rgba(0,0,0,0.5)',
-        letterSpacing: '2px',
-        fontFamily: 'Arial Black, sans-serif',
+        textShadow: `
+            0 4px 0px #8B4513, 
+            0 6px 0px #654321,
+            0 8px 15px rgba(0,0,0,0.4),
+            2px 2px 0 #8B4513,
+            -2px -2px 0 #8B4513
+        `,
+        letterSpacing: '3px',
+        fontFamily: '"Bangers", "Arial Black", sans-serif',
+        textAlign: 'center',
+        lineHeight: '1',
     });
-    mainMenu.appendChild(title);
+    titleBanner.appendChild(title);
 
+    const titleSub = document.createElement('div');
+    titleSub.textContent = 'DEFENSE';
+    Object.assign(titleSub.style, {
+        fontSize: '38px',
+        color: '#ff6b6b',
+        fontWeight: 'bold',
+        textShadow: `
+            0 3px 0px #8B4513,
+            0 5px 10px rgba(0,0,0,0.4),
+            2px 2px 0 #8B4513,
+            -2px -2px 0 #8B4513
+        `,
+        letterSpacing: '8px',
+        fontFamily: '"Bangers", "Arial Black", sans-serif',
+        textAlign: 'center',
+        marginTop: '5px',
+    });
+    titleBanner.appendChild(titleSub);
+
+    // Decorative corner badges
+    const createCornerBadge = (emoji, top, left, right, bottom) => {
+        const badge = document.createElement('div');
+        badge.textContent = emoji;
+        Object.assign(badge.style, {
+            position: 'absolute',
+            fontSize: '28px',
+            ...(top !== null && { top: top + 'px' }),
+            ...(left !== null && { left: left + 'px' }),
+            ...(right !== null && { right: right + 'px' }),
+            ...(bottom !== null && { bottom: bottom + 'px' }),
+            filter: 'drop-shadow(2px 2px 2px rgba(0,0,0,0.5))',
+        });
+        return badge;
+    };
+    titleBanner.appendChild(createCornerBadge('🎈', -15, -15, null, null));
+    titleBanner.appendChild(createCornerBadge('🎯', -15, null, -15, null));
+    titleBanner.appendChild(createCornerBadge('💥', null, -15, null, -15));
+    titleBanner.appendChild(createCornerBadge('🏆', null, null, -15, -15));
+
+    titleContainer.appendChild(titleBanner);
+    mainMenu.appendChild(titleContainer);
+
+    // Start button - Premium styling
     const startButton = document.createElement('button');
-    startButton.textContent = 'PLAY';
+    startButton.textContent = '▶  PLAY';
     Object.assign(startButton.style, {
-        fontSize: '24px',
-        padding: '15px 60px',
-        background: 'linear-gradient(180deg, #4CAF50 0%, #388E3C 100%)',
+        fontSize: '28px',
+        padding: '18px 70px',
+        background: 'linear-gradient(180deg, #66d96a 0%, #4CAF50 30%, #388E3C 70%, #2E7D32 100%)',
         color: 'white',
-        border: '3px solid #2E7D32',
-        borderRadius: '8px',
+        border: '4px solid #1B5E20',
+        borderRadius: '50px',
         cursor: 'pointer',
         fontWeight: 'bold',
-        boxShadow: '0 4px 0px #1B5E20, 0 6px 10px rgba(0,0,0,0.3)',
-        transition: 'all 0.15s',
-        fontFamily: 'Arial Black, sans-serif',
+        boxShadow: `
+            0 6px 0px #1B5E20, 
+            0 8px 20px rgba(0,0,0,0.4),
+            inset 0 2px 0 rgba(255,255,255,0.3),
+            inset 0 -2px 5px rgba(0,0,0,0.2)
+        `,
+        transition: 'all 0.15s ease',
+        fontFamily: '"Fredoka", "Arial Black", sans-serif',
+        letterSpacing: '2px',
+        textShadow: '0 2px 4px rgba(0,0,0,0.3)',
+        marginTop: '20px',
     });
     startButton.onmouseover = () => {
-        startButton.style.transform = 'translateY(-2px)';
-        startButton.style.boxShadow = '0 6px 0px #1B5E20, 0 8px 15px rgba(0,0,0,0.3)';
+        startButton.style.transform = 'translateY(-3px) scale(1.02)';
+        startButton.style.boxShadow = `
+            0 9px 0px #1B5E20, 
+            0 12px 25px rgba(0,0,0,0.4),
+            inset 0 2px 0 rgba(255,255,255,0.3),
+            inset 0 -2px 5px rgba(0,0,0,0.2),
+            0 0 30px rgba(76, 175, 80, 0.4)
+        `;
+        startButton.style.background = 'linear-gradient(180deg, #7ae97e 0%, #5fbf63 30%, #4CAF50 70%, #388E3C 100%)';
     };
     startButton.onmouseout = () => {
-        startButton.style.transform = 'translateY(0)';
-        startButton.style.boxShadow = '0 4px 0px #1B5E20, 0 6px 10px rgba(0,0,0,0.3)';
+        startButton.style.transform = 'translateY(0) scale(1)';
+        startButton.style.boxShadow = `
+            0 6px 0px #1B5E20, 
+            0 8px 20px rgba(0,0,0,0.4),
+            inset 0 2px 0 rgba(255,255,255,0.3),
+            inset 0 -2px 5px rgba(0,0,0,0.2)
+        `;
+        startButton.style.background = 'linear-gradient(180deg, #66d96a 0%, #4CAF50 30%, #388E3C 70%, #2E7D32 100%)';
     };
     startButton.onmousedown = () => {
-        startButton.style.transform = 'translateY(2px)';
-        startButton.style.boxShadow = '0 2px 0px #1B5E20, 0 3px 5px rgba(0,0,0,0.3)';
+        startButton.style.transform = 'translateY(3px) scale(0.98)';
+        startButton.style.boxShadow = `
+            0 2px 0px #1B5E20, 
+            0 4px 10px rgba(0,0,0,0.3),
+            inset 0 2px 0 rgba(255,255,255,0.3),
+            inset 0 -2px 5px rgba(0,0,0,0.2)
+        `;
     };
     mainMenu.appendChild(startButton);
 
-    const instructions = document.createElement('div');
-    instructions.innerHTML = `
-        <div style="margin-top: 40px; text-align: center; line-height: 1.8;">
-            <div style="font-size: 20px; color: #ffd700; text-shadow: 1px 1px 2px rgba(0,0,0,0.5);">High Score: ${highScore}</div>
-            <div style="margin-top: 12px; font-size: 14px; color: #b8e6b8;">Hold mouse to shoot • Pop all the balloons!</div>
-        </div>
+    // Instructions panel
+    const instructionsPanel = document.createElement('div');
+    Object.assign(instructionsPanel.style, {
+        marginTop: '35px',
+        textAlign: 'center',
+        background: 'rgba(0,0,0,0.25)',
+        padding: '20px 40px',
+        borderRadius: '15px',
+        backdropFilter: 'blur(5px)',
+        border: '2px solid rgba(255,255,255,0.1)',
+    });
+
+    const highScoreDisplay = document.createElement('div');
+    highScoreDisplay.innerHTML = `🏆 <span style="color: #ffd700;">High Score:</span> <span style="color: #fff; font-weight: bold;">${highScore}</span>`;
+    Object.assign(highScoreDisplay.style, {
+        fontSize: '22px',
+        marginBottom: '12px',
+        fontFamily: '"Fredoka", sans-serif',
+        textShadow: '0 2px 4px rgba(0,0,0,0.5)',
+    });
+    instructionsPanel.appendChild(highScoreDisplay);
+
+    const controlsInfo = document.createElement('div');
+    controlsInfo.innerHTML = `
+        <span style="opacity: 0.9;">🖱️ Hold mouse to shoot</span>
+        <span style="margin: 0 15px; opacity: 0.5;">•</span>
+        <span style="opacity: 0.9;">🎈 Pop all the balloons!</span>
     `;
-    mainMenu.appendChild(instructions);
+    Object.assign(controlsInfo.style, {
+        fontSize: '15px',
+        color: '#c8f0c8',
+        fontFamily: '"Fredoka", sans-serif',
+    });
+    instructionsPanel.appendChild(controlsInfo);
+
+    mainMenu.appendChild(instructionsPanel);
     container.appendChild(mainMenu);
 
-    // Weapon Selection Menu - BTD style
+    // Weapon Selection Menu - Premium BTD style
     const weaponMenu = document.createElement('div');
     Object.assign(weaponMenu.style, {
         position: 'absolute',
@@ -90,7 +253,10 @@ export function initUI(container) {
         left: '0',
         width: '100%',
         height: '100%',
-        background: 'linear-gradient(180deg, #4a7c3f 0%, #2d5a27 50%, #1a3d15 100%)',
+        background: `
+            radial-gradient(ellipse at 50% 30%, rgba(100, 180, 70, 0.3) 0%, transparent 60%),
+            linear-gradient(180deg, #5a9c4f 0%, #3d7a37 30%, #2d5a27 60%, #1a3d15 100%)
+        `,
         display: 'none',
         flexDirection: 'column',
         justifyContent: 'center',
@@ -98,68 +264,102 @@ export function initUI(container) {
         zIndex: '1000',
     });
 
-    const weaponTitle = document.createElement('div');
-    weaponTitle.textContent = 'SELECT WEAPON';
-    Object.assign(weaponTitle.style, {
-        fontSize: '36px',
-        color: '#ffd700',
-        fontWeight: 'bold',
-        marginBottom: '40px',
-        textShadow: '2px 2px 0px #8B4513',
-        fontFamily: 'Arial Black, sans-serif',
+    const weaponTitleBanner = document.createElement('div');
+    Object.assign(weaponTitleBanner.style, {
+        background: 'linear-gradient(180deg, #c4943a 0%, #8B6914 50%, #6B4F0E 100%)',
+        padding: '18px 45px',
+        borderRadius: '12px',
+        border: '4px solid #5D4E37',
+        boxShadow: '0 6px 0px #3d2e1e, 0 10px 25px rgba(0,0,0,0.4)',
+        marginBottom: '35px',
     });
-    weaponMenu.appendChild(weaponTitle);
+
+    const weaponTitle = document.createElement('div');
+    weaponTitle.textContent = '🎯 SELECT WEAPON';
+    Object.assign(weaponTitle.style, {
+        fontSize: '32px',
+        color: '#ffeaa0',
+        fontWeight: 'bold',
+        textShadow: '0 3px 0px #8B4513, 0 5px 10px rgba(0,0,0,0.4)',
+        fontFamily: '"Bangers", "Arial Black", sans-serif',
+        letterSpacing: '2px',
+    });
+    weaponTitleBanner.appendChild(weaponTitle);
+    weaponMenu.appendChild(weaponTitleBanner);
 
     const weaponGrid = document.createElement('div');
     Object.assign(weaponGrid.style, {
         display: 'grid',
         gridTemplateColumns: 'repeat(2, 1fr)',
-        gap: '20px',
-        maxWidth: '800px',
+        gap: '25px',
+        maxWidth: '850px',
+        padding: '10px',
     });
 
-    // Create weapon selection cards - BTD style
+    // Create weapon selection cards - Premium BTD style
     Object.values(WEAPONS).forEach(weapon => {
         const card = document.createElement('div');
         Object.assign(card.style, {
-            padding: '20px',
-            background: 'linear-gradient(180deg, #8B6914 0%, #6B4F0E 100%)',
-            border: '3px solid #5D4E37',
-            borderRadius: '10px',
+            padding: '22px 25px',
+            background: `
+                linear-gradient(180deg, #c4943a 0%, #a67c30 15%, #8B6914 50%, #6B4F0E 100%)
+            `,
+            border: '4px solid #5D4E37',
+            borderRadius: '15px',
             cursor: 'pointer',
-            transition: 'all 0.2s',
+            transition: 'all 0.25s cubic-bezier(0.4, 0, 0.2, 1)',
             textAlign: 'center',
-            boxShadow: '0 4px 8px rgba(0,0,0,0.3)',
+            boxShadow: '0 6px 0px #3d2e1e, 0 8px 20px rgba(0,0,0,0.4), inset 0 2px 0 rgba(255,255,255,0.15)',
+            position: 'relative',
+            overflow: 'hidden',
         });
 
-        card.innerHTML = `
-            <div style="font-size: 22px; color: #ffd700; font-weight: bold; margin-bottom: 8px; font-family: Arial Black, sans-serif;">
+        // Shine effect overlay
+        const shine = document.createElement('div');
+        Object.assign(shine.style, {
+            position: 'absolute',
+            top: '0',
+            left: '-100%',
+            width: '50%',
+            height: '100%',
+            background: 'linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent)',
+            transition: 'left 0.5s ease',
+            pointerEvents: 'none',
+        });
+        card.appendChild(shine);
+
+        const cardContent = document.createElement('div');
+        cardContent.innerHTML = `
+            <div style="font-size: 24px; color: #ffeaa0; font-weight: bold; margin-bottom: 10px; font-family: 'Bangers', 'Arial Black', sans-serif; letter-spacing: 1px; text-shadow: 0 2px 0 rgba(0,0,0,0.3);">
                 ${weapon.name}
             </div>
-            <div style="font-size: 13px; color: #e8d5a3; margin-bottom: 12px; line-height: 1.5;">
+            <div style="font-size: 14px; color: #e8d5a3; margin-bottom: 15px; line-height: 1.6; font-family: 'Fredoka', sans-serif;">
                 ${weapon.description}
             </div>
-            <div style="display: flex; justify-content: space-around; margin-top: 12px;">
-                <div style="text-align: center;">
-                    <div style="color: #ff9999; font-size: 11px;">DAMAGE</div>
-                    <div style="color: white; font-size: 18px; font-weight: bold;">${weapon.damage}x</div>
+            <div style="display: flex; justify-content: space-around; margin-top: 15px; padding-top: 12px; border-top: 2px solid rgba(255,255,255,0.15);">
+                <div style="text-align: center; background: rgba(0,0,0,0.2); padding: 8px 18px; border-radius: 8px;">
+                    <div style="color: #ff9999; font-size: 11px; font-weight: bold; letter-spacing: 1px; font-family: 'Fredoka', sans-serif;">⚔️ DAMAGE</div>
+                    <div style="color: white; font-size: 22px; font-weight: bold; font-family: 'Bangers', sans-serif;">${weapon.damage}x</div>
                 </div>
-                <div style="text-align: center;">
-                    <div style="color: #99ff99; font-size: 11px;">FIRE RATE</div>
-                    <div style="color: white; font-size: 18px; font-weight: bold;">${(1/weapon.fireRate).toFixed(1)}/s</div>
+                <div style="text-align: center; background: rgba(0,0,0,0.2); padding: 8px 18px; border-radius: 8px;">
+                    <div style="color: #99ff99; font-size: 11px; font-weight: bold; letter-spacing: 1px; font-family: 'Fredoka', sans-serif;">⚡ FIRE RATE</div>
+                    <div style="color: white; font-size: 22px; font-weight: bold; font-family: 'Bangers', sans-serif;">${(1/weapon.fireRate).toFixed(1)}/s</div>
                 </div>
             </div>
         `;
+        card.appendChild(cardContent);
 
         card.onmouseover = () => {
-            card.style.transform = 'translateY(-3px)';
-            card.style.boxShadow = '0 6px 12px rgba(0,0,0,0.4)';
+            card.style.transform = 'translateY(-6px) scale(1.02)';
+            card.style.boxShadow = '0 12px 0px #3d2e1e, 0 16px 35px rgba(0,0,0,0.5), inset 0 2px 0 rgba(255,255,255,0.2), 0 0 25px rgba(255, 215, 0, 0.3)';
             card.style.borderColor = '#ffd700';
+            shine.style.left = '150%';
         };
         card.onmouseout = () => {
-            card.style.transform = 'translateY(0)';
-            card.style.boxShadow = '0 4px 8px rgba(0,0,0,0.3)';
+            card.style.transform = 'translateY(0) scale(1)';
+            card.style.boxShadow = '0 6px 0px #3d2e1e, 0 8px 20px rgba(0,0,0,0.4), inset 0 2px 0 rgba(255,255,255,0.15)';
             card.style.borderColor = '#5D4E37';
+            shine.style.left = '-100%';
         };
         card.onclick = () => {
             setCurrentWeapon(weapon.id);
@@ -180,21 +380,31 @@ export function initUI(container) {
     weaponMenu.appendChild(weaponGrid);
     container.appendChild(weaponMenu);
 
-    // Crosshair
+    // Crosshair - Premium design
     const crosshair = document.createElement('div');
-    crosshair.textContent = '+';
     Object.assign(crosshair.style, {
         position: 'absolute',
         top: '50%',
         left: '50%',
         transform: 'translate(-50%, -50%)',
-        fontSize: '32px',
-        color: '#4ecdc4',
+        width: '40px',
+        height: '40px',
         pointerEvents: 'none',
         userSelect: 'none',
-        textShadow: '0 0 10px rgba(78, 205, 196, 0.8)',
         display: 'none',
     });
+    
+    // Create SVG crosshair
+    crosshair.innerHTML = `
+        <svg width="40" height="40" viewBox="0 0 40 40" style="filter: drop-shadow(0 0 8px rgba(78, 205, 196, 0.8));">
+            <circle cx="20" cy="20" r="12" fill="none" stroke="#4ecdc4" stroke-width="2" opacity="0.8"/>
+            <circle cx="20" cy="20" r="3" fill="#4ecdc4"/>
+            <line x1="20" y1="2" x2="20" y2="10" stroke="#4ecdc4" stroke-width="2" stroke-linecap="round"/>
+            <line x1="20" y1="30" x2="20" y2="38" stroke="#4ecdc4" stroke-width="2" stroke-linecap="round"/>
+            <line x1="2" y1="20" x2="10" y2="20" stroke="#4ecdc4" stroke-width="2" stroke-linecap="round"/>
+            <line x1="30" y1="20" x2="38" y2="20" stroke="#4ecdc4" stroke-width="2" stroke-linecap="round"/>
+        </svg>
+    `;
     container.appendChild(crosshair);
 
     // HUD Container
@@ -208,85 +418,87 @@ export function initUI(container) {
         pointerEvents: 'none',
         userSelect: 'none',
         display: 'none',
-        fontFamily: 'Arial, sans-serif',
+        fontFamily: '"Fredoka", Arial, sans-serif',
     });
     container.appendChild(hudContainer);
 
-    // Score and stats panel - BTD wood style
+    // Score and stats panel - Premium BTD wood style
     const statsPanel = document.createElement('div');
     Object.assign(statsPanel.style, {
         position: 'absolute',
         top: '15px',
         left: '15px',
-        padding: '12px 18px',
-        background: 'linear-gradient(180deg, #8B6914 0%, #6B4F0E 100%)',
-        borderRadius: '8px',
-        border: '3px solid #5D4E37',
-        boxShadow: '0 4px 8px rgba(0, 0, 0, 0.4)',
+        padding: '15px 22px',
+        background: 'linear-gradient(180deg, #c4943a 0%, #a67c30 20%, #8B6914 50%, #6B4F0E 100%)',
+        borderRadius: '12px',
+        border: '4px solid #5D4E37',
+        boxShadow: '0 5px 0px #3d2e1e, 0 8px 20px rgba(0, 0, 0, 0.5), inset 0 2px 0 rgba(255,255,255,0.15)',
+        minWidth: '180px',
     });
 
     const scoreDiv = document.createElement('div');
-    scoreDiv.textContent = `Score: ${score}`;
+    scoreDiv.innerHTML = `💰 Score: <span style="color: #fff;">${score}</span>`;
     Object.assign(scoreDiv.style, {
         fontSize: '20px',
-        color: '#ffd700',
+        color: '#ffeaa0',
         fontWeight: 'bold',
-        textShadow: '1px 1px 2px rgba(0,0,0,0.5)',
-        marginBottom: '4px',
+        textShadow: '0 2px 3px rgba(0,0,0,0.4)',
+        marginBottom: '6px',
     });
     statsPanel.appendChild(scoreDiv);
 
     const highScoreDiv = document.createElement('div');
-    highScoreDiv.textContent = `Best: ${highScore}`;
+    highScoreDiv.innerHTML = `🏆 Best: <span style="color: #e8d5a3;">${highScore}</span>`;
     Object.assign(highScoreDiv.style, {
         fontSize: '14px',
         color: '#e8d5a3',
-        marginBottom: '6px',
+        marginBottom: '8px',
     });
     statsPanel.appendChild(highScoreDiv);
 
     const comboDiv = document.createElement('div');
     comboDiv.textContent = '';
     Object.assign(comboDiv.style, {
-        fontSize: '16px',
-        color: '#ff9999',
+        fontSize: '18px',
+        color: '#ff6b6b',
         fontWeight: 'bold',
-        marginTop: '6px',
+        marginTop: '8px',
+        textShadow: '0 0 10px rgba(255, 107, 107, 0.6)',
     });
     statsPanel.appendChild(comboDiv);
 
     const weaponDiv = document.createElement('div');
     Object.assign(weaponDiv.style, {
-        fontSize: '12px',
-        color: '#b8e6b8',
-        marginTop: '8px',
-        paddingTop: '6px',
-        borderTop: '1px solid rgba(255,255,255,0.2)',
+        fontSize: '13px',
+        color: '#c8f0c8',
+        marginTop: '10px',
+        paddingTop: '10px',
+        borderTop: '2px solid rgba(255,255,255,0.15)',
     });
     statsPanel.appendChild(weaponDiv);
 
     // Wave info (integrated into stats panel)
     const waveDivider = document.createElement('div');
     Object.assign(waveDivider.style, {
-        marginTop: '8px',
-        paddingTop: '8px',
-        borderTop: '1px solid rgba(255,255,255,0.2)',
+        marginTop: '10px',
+        paddingTop: '10px',
+        borderTop: '2px solid rgba(255,255,255,0.15)',
     });
 
     const waveNumDiv = document.createElement('div');
-    waveNumDiv.textContent = 'WAVE 1';
+    waveNumDiv.innerHTML = '🌊 <span style="color: #ffeaa0;">WAVE 1</span>';
     Object.assign(waveNumDiv.style, {
-        fontSize: '16px',
+        fontSize: '17px',
         color: '#ffd700',
         fontWeight: 'bold',
-        marginBottom: '2px',
+        marginBottom: '4px',
     });
     waveDivider.appendChild(waveNumDiv);
 
     const balloonsRemainingDiv = document.createElement('div');
-    balloonsRemainingDiv.textContent = '0 left to pop';
+    balloonsRemainingDiv.innerHTML = '🎈 <span style="color: #e8d5a3;">0 left to pop</span>';
     Object.assign(balloonsRemainingDiv.style, {
-        fontSize: '13px',
+        fontSize: '14px',
         color: '#e8d5a3',
     });
     waveDivider.appendChild(balloonsRemainingDiv);
@@ -294,22 +506,22 @@ export function initUI(container) {
     statsPanel.appendChild(waveDivider);
     hudContainer.appendChild(statsPanel);
 
-    // Lives display - BTD style
+    // Lives display - Premium BTD style
     const livesDiv = document.createElement('div');
-    livesDiv.textContent = `Lives: ${lives}`;
+    livesDiv.innerHTML = `❤️ Lives: <span style="color: #fff;">${lives}</span>`;
     Object.assign(livesDiv.style, {
         position: 'absolute',
         top: '15px',
         right: '15px',
         fontSize: '20px',
-        color: '#ff6666',
+        color: '#ff6b6b',
         fontWeight: 'bold',
-        textShadow: '1px 1px 2px rgba(0,0,0,0.5)',
-        padding: '10px 18px',
-        background: 'linear-gradient(180deg, #8B6914 0%, #6B4F0E 100%)',
-        borderRadius: '8px',
-        border: '3px solid #5D4E37',
-        boxShadow: '0 4px 8px rgba(0, 0, 0, 0.4)',
+        textShadow: '0 2px 3px rgba(0,0,0,0.4)',
+        padding: '15px 22px',
+        background: 'linear-gradient(180deg, #c4943a 0%, #a67c30 20%, #8B6914 50%, #6B4F0E 100%)',
+        borderRadius: '12px',
+        border: '4px solid #5D4E37',
+        boxShadow: '0 5px 0px #3d2e1e, 0 8px 20px rgba(0, 0, 0, 0.5), inset 0 2px 0 rgba(255,255,255,0.15)',
     });
     hudContainer.appendChild(livesDiv);
 
@@ -317,16 +529,19 @@ export function initUI(container) {
 
     // Hint text
     const hintDiv = document.createElement('div');
-    hintDiv.textContent = 'Press ESC to pause';
+    hintDiv.textContent = '⏸️ Press ESC to pause';
     Object.assign(hintDiv.style, {
         position: 'absolute',
-        bottom: '20px',
+        bottom: '25px',
         left: '50%',
         transform: 'translateX(-50%)',
         fontSize: '14px',
-        color: 'white',
-        textShadow: '0 0 5px black',
-        opacity: '0.6',
+        color: 'rgba(255,255,255,0.7)',
+        textShadow: '0 2px 8px rgba(0,0,0,0.8)',
+        background: 'rgba(0,0,0,0.3)',
+        padding: '8px 20px',
+        borderRadius: '20px',
+        backdropFilter: 'blur(5px)',
     });
     hudContainer.appendChild(hintDiv);
 
@@ -342,7 +557,7 @@ export function initUI(container) {
     });
     container.appendChild(warningsContainer);
 
-    // Pause menu
+    // Pause menu - Premium styling
     const pauseMenu = document.createElement('div');
     Object.assign(pauseMenu.style, {
         position: 'absolute',
@@ -350,57 +565,97 @@ export function initUI(container) {
         left: '0',
         width: '100%',
         height: '100%',
-        backgroundColor: 'rgba(0, 0, 0, 0.8)',
+        background: 'radial-gradient(ellipse at center, rgba(0,0,0,0.85) 0%, rgba(0,0,0,0.95) 100%)',
         display: 'none',
         flexDirection: 'column',
         justifyContent: 'center',
         alignItems: 'center',
         zIndex: '999',
+        backdropFilter: 'blur(5px)',
+    });
+
+    const pausePanel = document.createElement('div');
+    Object.assign(pausePanel.style, {
+        background: 'linear-gradient(180deg, #c4943a 0%, #8B6914 50%, #6B4F0E 100%)',
+        padding: '40px 60px',
+        borderRadius: '20px',
+        border: '5px solid #5D4E37',
+        boxShadow: '0 8px 0px #3d2e1e, 0 15px 40px rgba(0,0,0,0.6)',
+        textAlign: 'center',
     });
 
     const pauseTitle = document.createElement('div');
-    pauseTitle.textContent = 'PAUSED';
+    pauseTitle.textContent = '⏸️ PAUSED';
     Object.assign(pauseTitle.style, {
-        fontSize: '48px',
-        color: '#ffd93d',
+        fontSize: '42px',
+        color: '#ffeaa0',
         fontWeight: 'bold',
-        marginBottom: '30px',
-        textShadow: '0 0 20px rgba(255, 217, 61, 0.8)',
+        marginBottom: '35px',
+        textShadow: '0 3px 0px #8B4513, 0 5px 15px rgba(0,0,0,0.4)',
+        fontFamily: '"Bangers", "Arial Black", sans-serif',
+        letterSpacing: '2px',
     });
-    pauseMenu.appendChild(pauseTitle);
+    pausePanel.appendChild(pauseTitle);
 
     const resumeButton = document.createElement('button');
-    resumeButton.textContent = 'RESUME';
+    resumeButton.textContent = '▶️ RESUME';
     Object.assign(resumeButton.style, {
         fontSize: '20px',
-        padding: '12px 35px',
-        backgroundColor: '#4ecdc4',
+        padding: '14px 45px',
+        background: 'linear-gradient(180deg, #66d96a 0%, #4CAF50 50%, #388E3C 100%)',
         color: 'white',
-        border: 'none',
-        borderRadius: '8px',
+        border: '3px solid #2E7D32',
+        borderRadius: '30px',
         cursor: 'pointer',
         fontWeight: 'bold',
         marginBottom: '15px',
+        boxShadow: '0 4px 0px #1B5E20, 0 6px 15px rgba(0,0,0,0.3)',
+        fontFamily: '"Fredoka", sans-serif',
+        transition: 'all 0.15s ease',
+        display: 'block',
+        width: '100%',
     });
-    pauseMenu.appendChild(resumeButton);
+    resumeButton.onmouseover = () => {
+        resumeButton.style.transform = 'translateY(-2px)';
+        resumeButton.style.boxShadow = '0 6px 0px #1B5E20, 0 8px 20px rgba(0,0,0,0.4)';
+    };
+    resumeButton.onmouseout = () => {
+        resumeButton.style.transform = 'translateY(0)';
+        resumeButton.style.boxShadow = '0 4px 0px #1B5E20, 0 6px 15px rgba(0,0,0,0.3)';
+    };
+    pausePanel.appendChild(resumeButton);
 
     const restartButton = document.createElement('button');
-    restartButton.textContent = 'RESTART';
+    restartButton.textContent = '🔄 RESTART';
     Object.assign(restartButton.style, {
         fontSize: '20px',
-        padding: '12px 35px',
-        backgroundColor: '#ff6b6b',
+        padding: '14px 45px',
+        background: 'linear-gradient(180deg, #ff8a8a 0%, #ff6b6b 50%, #e55555 100%)',
         color: 'white',
-        border: 'none',
-        borderRadius: '8px',
+        border: '3px solid #c44',
+        borderRadius: '30px',
         cursor: 'pointer',
         fontWeight: 'bold',
+        boxShadow: '0 4px 0px #a33, 0 6px 15px rgba(0,0,0,0.3)',
+        fontFamily: '"Fredoka", sans-serif',
+        transition: 'all 0.15s ease',
+        display: 'block',
+        width: '100%',
     });
-    pauseMenu.appendChild(restartButton);
+    restartButton.onmouseover = () => {
+        restartButton.style.transform = 'translateY(-2px)';
+        restartButton.style.boxShadow = '0 6px 0px #a33, 0 8px 20px rgba(0,0,0,0.4)';
+    };
+    restartButton.onmouseout = () => {
+        restartButton.style.transform = 'translateY(0)';
+        restartButton.style.boxShadow = '0 4px 0px #a33, 0 6px 15px rgba(0,0,0,0.3)';
+    };
+    pausePanel.appendChild(restartButton);
 
+    pauseMenu.appendChild(pausePanel);
     container.appendChild(pauseMenu);
 
-    // Game over screen
+    // Game over screen - Premium styling
     const gameOverScreen = document.createElement('div');
     Object.assign(gameOverScreen.style, {
         position: 'absolute',
@@ -408,7 +663,7 @@ export function initUI(container) {
         left: '0',
         width: '100%',
         height: '100%',
-        backgroundColor: 'rgba(0, 0, 0, 0.95)',
+        background: 'radial-gradient(ellipse at center, rgba(40,0,0,0.9) 0%, rgba(20,0,0,0.98) 100%)',
         display: 'none',
         flexDirection: 'column',
         justifyContent: 'center',
@@ -416,39 +671,65 @@ export function initUI(container) {
         zIndex: '1000',
     });
 
+    const gameOverPanel = document.createElement('div');
+    Object.assign(gameOverPanel.style, {
+        background: 'linear-gradient(180deg, #c4943a 0%, #8B6914 50%, #6B4F0E 100%)',
+        padding: '45px 70px',
+        borderRadius: '20px',
+        border: '5px solid #5D4E37',
+        boxShadow: '0 8px 0px #3d2e1e, 0 15px 40px rgba(0,0,0,0.6)',
+        textAlign: 'center',
+    });
+
     const gameOverTitle = document.createElement('div');
-    gameOverTitle.textContent = 'GAME OVER';
+    gameOverTitle.textContent = '💥 GAME OVER';
     Object.assign(gameOverTitle.style, {
-        fontSize: '56px',
+        fontSize: '48px',
         color: '#ff6b6b',
         fontWeight: 'bold',
-        marginBottom: '20px',
-        textShadow: '0 0 30px rgba(255, 107, 107, 0.8)',
+        marginBottom: '25px',
+        textShadow: '0 4px 0px #8B4513, 0 0 30px rgba(255, 107, 107, 0.6)',
+        fontFamily: '"Bangers", "Arial Black", sans-serif',
+        letterSpacing: '2px',
     });
-    gameOverScreen.appendChild(gameOverTitle);
+    gameOverPanel.appendChild(gameOverTitle);
 
     const finalScoreDiv = document.createElement('div');
     Object.assign(finalScoreDiv.style, {
-        fontSize: '32px',
-        color: '#ffd93d',
-        marginBottom: '40px',
+        fontSize: '28px',
+        color: '#ffeaa0',
+        marginBottom: '35px',
+        fontFamily: '"Fredoka", sans-serif',
+        textShadow: '0 2px 4px rgba(0,0,0,0.4)',
     });
-    gameOverScreen.appendChild(finalScoreDiv);
+    gameOverPanel.appendChild(finalScoreDiv);
 
     const playAgainButton = document.createElement('button');
-    playAgainButton.textContent = 'PLAY AGAIN';
+    playAgainButton.textContent = '🔄 PLAY AGAIN';
     Object.assign(playAgainButton.style, {
-        fontSize: '24px',
-        padding: '15px 40px',
-        backgroundColor: '#4ecdc4',
+        fontSize: '22px',
+        padding: '16px 50px',
+        background: 'linear-gradient(180deg, #66d96a 0%, #4CAF50 50%, #388E3C 100%)',
         color: 'white',
-        border: 'none',
-        borderRadius: '10px',
+        border: '4px solid #2E7D32',
+        borderRadius: '35px',
         cursor: 'pointer',
         fontWeight: 'bold',
+        boxShadow: '0 5px 0px #1B5E20, 0 8px 20px rgba(0,0,0,0.4)',
+        fontFamily: '"Fredoka", sans-serif',
+        transition: 'all 0.15s ease',
     });
-    gameOverScreen.appendChild(playAgainButton);
+    playAgainButton.onmouseover = () => {
+        playAgainButton.style.transform = 'translateY(-2px)';
+        playAgainButton.style.boxShadow = '0 7px 0px #1B5E20, 0 10px 25px rgba(0,0,0,0.5)';
+    };
+    playAgainButton.onmouseout = () => {
+        playAgainButton.style.transform = 'translateY(0)';
+        playAgainButton.style.boxShadow = '0 5px 0px #1B5E20, 0 8px 20px rgba(0,0,0,0.4)';
+    };
+    gameOverPanel.appendChild(playAgainButton);
 
+    gameOverScreen.appendChild(gameOverPanel);
     container.appendChild(gameOverScreen);
 
     // Functions
@@ -471,16 +752,16 @@ export function initUI(container) {
     function updateWeaponDisplay() {
         const weapon = getCurrentWeapon();
         weaponDiv.innerHTML = `
-            <div style="font-weight: bold; margin-bottom: 2px;">${weapon.name}</div>
-            <div style="font-size: 10px; opacity: 0.8;">DMG: ${weapon.damage}x | Rate: ${(1/weapon.fireRate).toFixed(1)}/s</div>
+            <div style="font-weight: bold; margin-bottom: 3px;">🔫 ${weapon.name}</div>
+            <div style="font-size: 11px; opacity: 0.85;">⚔️ ${weapon.damage}x DMG | ⚡ ${(1/weapon.fireRate).toFixed(1)}/s</div>
         `;
     }
 
     function updateScore() {
-        scoreDiv.textContent = `Score: ${score}`;
-        highScoreDiv.textContent = `Best: ${highScore}`;
+        scoreDiv.innerHTML = `💰 Score: <span style="color: #fff;">${score}</span>`;
+        highScoreDiv.innerHTML = `🏆 Best: <span style="color: #e8d5a3;">${highScore}</span>`;
         if (combo > 1) {
-            comboDiv.textContent = `${combo}x COMBO!`;
+            comboDiv.innerHTML = `🔥 <span style="color: #ffcc00;">${combo}x</span> COMBO!`;
             comboDiv.style.display = 'block';
         } else {
             comboDiv.style.display = 'none';
@@ -516,9 +797,10 @@ export function initUI(container) {
     }
 
     function updateLives() {
-        livesDiv.textContent = `Lives: ${lives}`;
+        livesDiv.innerHTML = `❤️ Lives: <span style="color: #fff;">${lives}</span>`;
         if (lives <= 10) {
             livesDiv.style.animation = 'pulse 0.5s infinite';
+            livesDiv.style.color = '#ff4444';
         }
     }
 
@@ -533,20 +815,21 @@ export function initUI(container) {
 
     function showLifeLostWarning() {
         const warning = document.createElement('div');
-        warning.innerHTML = '⚠️ BALLOON ESCAPED!';
+        warning.innerHTML = '💨 BALLOON ESCAPED!';
         Object.assign(warning.style, {
             position: 'absolute',
             top: '40%',
             left: '50%',
             transform: 'translate(-50%, -50%)',
-            fontSize: '48px',
-            color: '#ff4444',
-            fontWeight: '900',
-            textShadow: '0 0 30px rgba(255, 0, 0, 0.8), 2px 2px 0px black',
+            fontSize: '42px',
+            color: '#ff6b6b',
+            fontWeight: 'bold',
+            textShadow: '0 4px 0px #8B4513, 0 0 30px rgba(255, 107, 107, 0.6)',
             animation: 'zoomFadeOut 2s forwards',
             zIndex: '900',
             whiteSpace: 'nowrap',
-            fontFamily: 'Arial, sans-serif'
+            fontFamily: '"Bangers", "Arial Black", sans-serif',
+            letterSpacing: '2px',
         });
         container.appendChild(warning);
         setTimeout(() => warning.remove(), 2000);
@@ -649,13 +932,23 @@ export function initUI(container) {
             80% { opacity: 1; transform: translate(-50%, -50%) scale(1); }
             100% { opacity: 0; transform: translate(-50%, -50%) scale(0.8); }
         }
+        @keyframes floatUp {
+            0% { transform: translateY(0); opacity: 0.6; }
+            10% { opacity: 0.6; }
+            90% { opacity: 0.6; }
+            100% { transform: translateY(-120vh); opacity: 0; }
+        }
+        @keyframes gentlePulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.02); }
+        }
     `;
     document.head.appendChild(style);
 
     // Wave display functions
     function updateWaveDisplay() {
-        waveNumDiv.textContent = `Wave ${currentWaveNum}`;
-        balloonsRemainingDiv.textContent = `${balloonsRemaining} left to pop`;
+        waveNumDiv.innerHTML = ` <span style="color: #ffeaa0;">WAVE ${currentWaveNum}</span>`;
+        balloonsRemainingDiv.innerHTML = `🎈 <span style="color: #e8d5a3;">${balloonsRemaining} left to pop</span>`;
     }
 
     function showWaveStart(waveNum, description) {
@@ -663,19 +956,26 @@ export function initUI(container) {
         updateWaveDisplay();
 
         const notification = document.createElement('div');
-        notification.innerHTML = `<div style="font-size: 42px; margin-bottom: 8px; font-family: Arial Black, sans-serif;">WAVE ${waveNum}</div><div style="font-size: 20px; opacity: 0.9;">${description}</div>`;
+        notification.innerHTML = `
+            <div style="font-size: 52px; margin-bottom: 10px; font-family: 'Bangers', 'Arial Black', sans-serif; letter-spacing: 3px;"> WAVE ${waveNum}</div>
+            <div style="font-size: 22px; opacity: 0.95; font-family: 'Fredoka', sans-serif;">${description}</div>
+        `;
         Object.assign(notification.style, {
             position: 'absolute',
             top: '40%',
             left: '50%',
             transform: 'translate(-50%, -50%)',
-            color: '#ffd700',
+            color: '#ffeaa0',
             fontWeight: 'bold',
-            textShadow: '3px 3px 0px #8B4513, 0 0 20px rgba(0,0,0,0.5)',
+            textShadow: '0 4px 0px #8B4513, 0 6px 15px rgba(0,0,0,0.5)',
             textAlign: 'center',
             animation: 'waveNotification 2.5s forwards',
             zIndex: '900',
             pointerEvents: 'none',
+            background: 'rgba(0,0,0,0.3)',
+            padding: '25px 50px',
+            borderRadius: '20px',
+            backdropFilter: 'blur(5px)',
         });
         container.appendChild(notification);
         setTimeout(() => notification.remove(), 2500);
