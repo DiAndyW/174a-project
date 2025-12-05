@@ -1,7 +1,7 @@
 // ui.js - Enhanced UI with menus, warnings, and advanced scoring
 import { WEAPONS, setCurrentWeapon, getCurrentWeapon } from './weapons.js';
 import { loadWeaponModel } from './objects.js';
-import { getGravity, setGravity, getBalloonSize, setBalloonSize, resetConfig } from './config.js';
+import { getGravity, setGravity, getBalloonSize, setBalloonSize, getSpawnDirection, setSpawnDirection, resetConfig } from './config.js';
 
 export function initUI(container) {
     let score = 0;
@@ -602,6 +602,74 @@ export function initUI(container) {
     sizeContainer.appendChild(sizeValue);
 
     settingsPanel.appendChild(sizeContainer);
+
+    // Spawn direction control
+    const spawnContainer = document.createElement('div');
+    Object.assign(spawnContainer.style, {
+        marginBottom: '30px',
+        textAlign: 'left',
+    });
+
+    const spawnLabel = document.createElement('div');
+    spawnLabel.textContent = 'Spawn Direction:';
+    Object.assign(spawnLabel.style, {
+        fontSize: '18px',
+        color: '#ffeaa0',
+        fontWeight: 'bold',
+        marginBottom: '10px',
+        fontFamily: '"Fredoka", sans-serif',
+    });
+    spawnContainer.appendChild(spawnLabel);
+
+    const spawnButtonsContainer = document.createElement('div');
+    Object.assign(spawnButtonsContainer.style, {
+        display: 'flex',
+        gap: '10px',
+        justifyContent: 'space-between',
+    });
+
+    const spawnOptions = [
+        { value: 'left', label: 'Left' },
+        { value: 'right', label: 'Right' },
+        { value: 'random', label: 'Random' }
+    ];
+
+    const spawnButtons = {};
+
+    spawnOptions.forEach(option => {
+        const btn = document.createElement('button');
+        btn.textContent = option.label;
+        btn.dataset.value = option.value;
+        Object.assign(btn.style, {
+            flex: '1',
+            fontSize: '14px',
+            padding: '10px 15px',
+            background: getSpawnDirection() === option.value
+                ? 'linear-gradient(180deg, #66d96a 0%, #4CAF50 50%, #388E3C 100%)'
+                : 'linear-gradient(180deg, #888 0%, #666 50%, #555 100%)',
+            color: 'white',
+            border: '3px solid ' + (getSpawnDirection() === option.value ? '#2E7D32' : '#333'),
+            borderRadius: '12px',
+            cursor: 'pointer',
+            fontWeight: 'bold',
+            boxShadow: '0 3px 0px ' + (getSpawnDirection() === option.value ? '#1B5E20' : '#222') + ', 0 4px 10px rgba(0,0,0,0.3)',
+            fontFamily: '"Fredoka", sans-serif',
+            transition: 'all 0.15s ease',
+        });
+
+        btn.onmouseover = () => {
+            btn.style.transform = 'translateY(-2px)';
+        };
+        btn.onmouseout = () => {
+            btn.style.transform = 'translateY(0)';
+        };
+
+        spawnButtons[option.value] = btn;
+        spawnButtonsContainer.appendChild(btn);
+    });
+
+    spawnContainer.appendChild(spawnButtonsContainer);
+    settingsPanel.appendChild(spawnContainer);
 
     // Buttons container
     const settingsButtonsContainer = document.createElement('div');
@@ -1270,12 +1338,42 @@ export function initUI(container) {
         sizeValue.textContent = `${value.toFixed(1)}x`;
     });
 
+    // Spawn direction button listeners
+    Object.keys(spawnButtons).forEach(direction => {
+        spawnButtons[direction].addEventListener('click', () => {
+            setSpawnDirection(direction);
+
+            // Update button styles
+            Object.keys(spawnButtons).forEach(key => {
+                const btn = spawnButtons[key];
+                const isActive = key === direction;
+                btn.style.background = isActive
+                    ? 'linear-gradient(180deg, #66d96a 0%, #4CAF50 50%, #388E3C 100%)'
+                    : 'linear-gradient(180deg, #888 0%, #666 50%, #555 100%)';
+                btn.style.border = '3px solid ' + (isActive ? '#2E7D32' : '#333');
+                btn.style.boxShadow = '0 3px 0px ' + (isActive ? '#1B5E20' : '#222') + ', 0 4px 10px rgba(0,0,0,0.3)';
+            });
+        });
+    });
+
     resetButton.addEventListener('click', () => {
         resetConfig();
         gravitySlider.value = getGravity().toString();
         gravityValue.textContent = `${getGravity().toFixed(1)} m/s²`;
         sizeSlider.value = getBalloonSize().toString();
         sizeValue.textContent = `${getBalloonSize().toFixed(1)}x`;
+
+        // Reset spawn direction buttons
+        const currentDirection = getSpawnDirection();
+        Object.keys(spawnButtons).forEach(key => {
+            const btn = spawnButtons[key];
+            const isActive = key === currentDirection;
+            btn.style.background = isActive
+                ? 'linear-gradient(180deg, #66d96a 0%, #4CAF50 50%, #388E3C 100%)'
+                : 'linear-gradient(180deg, #888 0%, #666 50%, #555 100%)';
+            btn.style.border = '3px solid ' + (isActive ? '#2E7D32' : '#333');
+            btn.style.boxShadow = '0 3px 0px ' + (isActive ? '#1B5E20' : '#222') + ', 0 4px 10px rgba(0,0,0,0.3)';
+        });
     });
 
     backButton.addEventListener('click', () => {

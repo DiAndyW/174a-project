@@ -1,7 +1,7 @@
 // balloons.js - Balloon creation and management with BTD-style types
 import * as THREE from 'three';
 import { OBJLoader } from 'three/addons/loaders/OBJLoader.js';
-import { getBalloonSize } from './config.js';
+import { getBalloonSize, getSpawnDirection } from './config.js';
 
 const balloons = [];
 const objLoader = new OBJLoader();
@@ -232,9 +232,22 @@ export function spawnBalloon(scene, startY = null, balloonTypeId = 'RED', positi
     const yPos = startY !== null ? startY : chosenHeight + (Math.random() - 0.5) * 0.3;
     const balloonType = BALLOON_TYPES[balloonTypeId] || BALLOON_TYPES.RED;
 
+    // Determine spawn side based on config
+    const spawnDirection = getSpawnDirection();
+    let spawnFromLeft;
+
+    if (spawnDirection === 'random') {
+        spawnFromLeft = Math.random() < 0.5;
+    } else if (spawnDirection === 'right') {
+        spawnFromLeft = false;
+    } else { // 'left' or default
+        spawnFromLeft = true;
+    }
+
     // Show spawn warning UI (only for non-child balloons)
     if (onBalloonSpawn && position === null) {
-        onBalloonSpawn(15, 50); // 15% left, 50% height
+        const xPercent = spawnFromLeft ? 15 : 85; // Left side or right side
+        onBalloonSpawn(xPercent, 50); // x% horizontal, 50% height
     }
 
     // Spawn after warning delay (instant if spawned from pop)
@@ -242,8 +255,8 @@ export function spawnBalloon(scene, startY = null, balloonTypeId = 'RED', positi
 
     setTimeout(() => {
         createBalloonMesh(balloonType, (balloonMesh, balloonObject) => {
-            // Start position
-            const startX = position !== null ? position.x : -5;
+            // Start position - use spawn direction unless this is a child balloon
+            const startX = position !== null ? position.x : (spawnFromLeft ? -5 : 5);
             const startZ = position !== null ? position.z : -10;
             const actualY = position !== null ? position.y : yPos;
 
@@ -256,10 +269,11 @@ export function spawnBalloon(scene, startY = null, balloonTypeId = 'RED', positi
 
             scene.add(balloonMesh);
 
-            // Movement - speed based on balloon type
+            // Movement - speed based on balloon type and spawn direction
             const baseSpeed = 1.5;
+            const directionMultiplier = spawnFromLeft ? 1 : -1;
             const velocity = new THREE.Vector3(
-                baseSpeed * balloonType.speedMultiplier,
+                baseSpeed * balloonType.speedMultiplier * directionMultiplier,
                 0.1,
                 0
             );
