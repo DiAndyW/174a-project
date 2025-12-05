@@ -278,7 +278,7 @@ export function initUI(container) {
     });
 
     const highScoreDisplay = document.createElement('div');
-    highScoreDisplay.innerHTML = `🏆 <span style="color: #ffd700;">High Score:</span> <span style="color: #fff; font-weight: bold;">${highScore}</span>`;
+    highScoreDisplay.innerHTML = `<span style="color: #ffd700;">High Score:</span> <span style="color: #fff; font-weight: bold;">${highScore}</span>`;
     Object.assign(highScoreDisplay.style, {
         fontSize: '22px',
         marginBottom: '12px',
@@ -499,7 +499,7 @@ export function initUI(container) {
     });
 
     const settingsTitle = document.createElement('div');
-    settingsTitle.textContent = '⚙️ SETTINGS';
+    settingsTitle.textContent = 'SETTINGS';
     Object.assign(settingsTitle.style, {
         fontSize: '38px',
         color: '#ffeaa0',
@@ -519,7 +519,7 @@ export function initUI(container) {
     });
 
     const gravityLabel = document.createElement('div');
-    gravityLabel.textContent = '🌍 Gravity:';
+    gravityLabel.textContent = 'Gravity:';
     Object.assign(gravityLabel.style, {
         fontSize: '18px',
         color: '#ffeaa0',
@@ -565,7 +565,7 @@ export function initUI(container) {
     });
 
     const sizeLabel = document.createElement('div');
-    sizeLabel.textContent = '🎈 Balloon Size:';
+    sizeLabel.textContent = 'Balloon Size:';
     Object.assign(sizeLabel.style, {
         fontSize: '18px',
         color: '#ffeaa0',
@@ -614,7 +614,7 @@ export function initUI(container) {
 
     // Reset button
     const resetButton = document.createElement('button');
-    resetButton.textContent = '🔄 Reset';
+    resetButton.textContent = 'Reset';
     Object.assign(resetButton.style, {
         fontSize: '16px',
         padding: '12px 30px',
@@ -786,7 +786,7 @@ export function initUI(container) {
     waveDivider.appendChild(waveNumDiv);
 
     const balloonsRemainingDiv = document.createElement('div');
-    balloonsRemainingDiv.innerHTML = '🎈 <span style="color: #e8d5a3;">0 left to pop</span>';
+    balloonsRemainingDiv.innerHTML = '<span style="color: #e8d5a3;">0 left to pop</span>';
     Object.assign(balloonsRemainingDiv.style, {
         fontSize: '14px',
         color: '#e8d5a3',
@@ -911,7 +911,7 @@ export function initUI(container) {
     });
 
     const pauseTitle = document.createElement('div');
-    pauseTitle.textContent = '⏸️ PAUSED';
+    pauseTitle.textContent = '⏸PAUSED';
     Object.assign(pauseTitle.style, {
         fontSize: '42px',
         color: '#ffeaa0',
@@ -924,7 +924,7 @@ export function initUI(container) {
     pausePanel.appendChild(pauseTitle);
 
     const resumeButton = document.createElement('button');
-    resumeButton.textContent = '▶️ RESUME';
+    resumeButton.textContent = '▶ RESUME';
     Object.assign(resumeButton.style, {
         fontSize: '20px',
         padding: '14px 45px',
@@ -952,7 +952,7 @@ export function initUI(container) {
     pausePanel.appendChild(resumeButton);
 
     const restartButton = document.createElement('button');
-    restartButton.textContent = '🔄 RESTART';
+    restartButton.textContent = 'RESTART';
     Object.assign(restartButton.style, {
         fontSize: '20px',
         padding: '14px 45px',
@@ -1031,7 +1031,7 @@ export function initUI(container) {
     gameOverPanel.appendChild(finalScoreDiv);
 
     const playAgainButton = document.createElement('button');
-    playAgainButton.textContent = '🔄 PLAY AGAIN';
+    playAgainButton.textContent = 'PLAY AGAIN';
     Object.assign(playAgainButton.style, {
         fontSize: '22px',
         padding: '16px 50px',
@@ -1078,16 +1078,16 @@ export function initUI(container) {
     function updateWeaponDisplay() {
         const weapon = getCurrentWeapon();
         weaponDiv.innerHTML = `
-            <div style="font-weight: bold; margin-bottom: 3px;">🔫 ${weapon.name}</div>
-            <div style="font-size: 11px; opacity: 0.85;">⚔️ ${weapon.damage}x DMG | ⚡ ${(1 / weapon.fireRate).toFixed(1)}/s</div>
+            <div style="font-weight: bold; margin-bottom: 3px;">${weapon.name}</div>
+            <div style="font-size: 11px; opacity: 0.85;">${weapon.damage}x DMG | ${(1 / weapon.fireRate).toFixed(1)}/s</div>
         `;
     }
 
     function updateScore() {
-        scoreDiv.innerHTML = `💰 Score: <span style="color: #fff;">${score}</span>`;
-        highScoreDiv.innerHTML = `🏆 Best: <span style="color: #e8d5a3;">${highScore}</span>`;
+        scoreDiv.innerHTML = `Score: <span style="color: #fff;">${score}</span>`;
+        highScoreDiv.innerHTML = `Best: <span style="color: #e8d5a3;">${highScore}</span>`;
         if (combo > 1) {
-            comboDiv.innerHTML = `🔥 <span style="color: #ffcc00;">${combo}x</span> COMBO!`;
+            comboDiv.innerHTML = `<span style="color: #ffcc00;">${combo}x</span> COMBO!`;
             comboDiv.style.display = 'block';
         } else {
             comboDiv.style.display = 'none';
@@ -1169,7 +1169,7 @@ export function initUI(container) {
 
     function showLifeLostWarning() {
         const warning = document.createElement('div');
-        warning.innerHTML = '💨 BALLOON ESCAPED!';
+        warning.innerHTML = 'BALLOON ESCAPED!!';
         Object.assign(warning.style, {
             position: 'absolute',
             top: '40%',
@@ -1213,7 +1213,7 @@ export function initUI(container) {
         hudContainer.style.display = 'none';
         crosshair.style.display = 'none';
         gameOverScreen.style.display = 'flex';
-        finalScoreDiv.textContent = `Final Score: ${score}${score >= highScore ? ' 🏆 NEW HIGH SCORE!' : ''}`;
+        finalScoreDiv.textContent = `Final Score: ${score}${score >= highScore ? ' NEW HIGH SCORE!' : ''}`;
     }
 
     function pauseGame() {
@@ -1339,7 +1339,7 @@ export function initUI(container) {
     // Wave display functions
     function updateWaveDisplay() {
         waveNumDiv.innerHTML = ` <span style="color: #ffeaa0;">WAVE ${currentWaveNum}</span>`;
-        balloonsRemainingDiv.innerHTML = `🎈 <span style="color: #e8d5a3;">${balloonsRemaining} left to pop</span>`;
+        balloonsRemainingDiv.innerHTML = `<span style="color: #e8d5a3;">${balloonsRemaining} left to pop</span>`;
     }
 
     function showWaveStart(waveNum, description) {
