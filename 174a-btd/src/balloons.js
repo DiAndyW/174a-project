@@ -1,7 +1,7 @@
 // balloons.js - Balloon creation and management with BTD-style types
 import * as THREE from 'three';
 import { OBJLoader } from 'three/addons/loaders/OBJLoader.js';
-import { getBalloonSize, getSpawnDirection } from './config.js';
+import { getBalloonSize, getSpawnDirection, getMovementPattern } from './config.js';
 
 const balloons = [];
 const objLoader = new OBJLoader();
@@ -278,9 +278,20 @@ export function spawnBalloon(scene, startY = null, balloonTypeId = 'RED', positi
                 0
             );
 
-            // Assign random pattern if not just moving straight
-            const patterns = Object.values(PATTERNS);
-            const pattern = position !== null ? PATTERNS.NORMAL : patterns[Math.floor(Math.random() * patterns.length)];
+            // Assign pattern based on config (or random if set to 'random')
+            let pattern;
+            if (position !== null) {
+                // Child balloons always use NORMAL pattern
+                pattern = PATTERNS.NORMAL;
+            } else {
+                const configPattern = getMovementPattern();
+                if (configPattern === 'random') {
+                    const patterns = Object.values(PATTERNS);
+                    pattern = patterns[Math.floor(Math.random() * patterns.length)];
+                } else {
+                    pattern = configPattern;
+                }
+            }
 
             balloons.push({
                 mesh: balloonMesh,

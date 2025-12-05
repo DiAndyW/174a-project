@@ -1,7 +1,7 @@
 // ui.js - Enhanced UI with menus, warnings, and advanced scoring
 import { WEAPONS, setCurrentWeapon, getCurrentWeapon } from './weapons.js';
 import { loadWeaponModel } from './objects.js';
-import { getGravity, setGravity, getBalloonSize, setBalloonSize, getSpawnDirection, setSpawnDirection, resetConfig } from './config.js';
+import { getGravity, setGravity, getBalloonSize, setBalloonSize, getSpawnDirection, setSpawnDirection, getMovementPattern, setMovementPattern, resetConfig } from './config.js';
 
 export function initUI(container) {
     let score = 0;
@@ -670,6 +670,75 @@ export function initUI(container) {
 
     spawnContainer.appendChild(spawnButtonsContainer);
     settingsPanel.appendChild(spawnContainer);
+
+    // Movement pattern control
+    const patternContainer = document.createElement('div');
+    Object.assign(patternContainer.style, {
+        marginBottom: '30px',
+        textAlign: 'left',
+    });
+
+    const patternLabel = document.createElement('div');
+    patternLabel.textContent = 'Movement Pattern:';
+    Object.assign(patternLabel.style, {
+        fontSize: '18px',
+        color: '#ffeaa0',
+        fontWeight: 'bold',
+        marginBottom: '10px',
+        fontFamily: '"Fredoka", sans-serif',
+    });
+    patternContainer.appendChild(patternLabel);
+
+    const patternButtonsContainer = document.createElement('div');
+    Object.assign(patternButtonsContainer.style, {
+        display: 'grid',
+        gridTemplateColumns: 'repeat(3, 1fr)',
+        gap: '8px',
+    });
+
+    const patternOptions = [
+        { value: 'random', label: 'Random' },
+        { value: 'NORMAL', label: 'Normal' },
+        { value: 'ZIGZAG', label: 'Zigzag' },
+        { value: 'SINE', label: 'Sine' },
+        { value: 'SPIRAL', label: 'Spiral' }
+    ];
+
+    const patternButtons = {};
+
+    patternOptions.forEach(option => {
+        const btn = document.createElement('button');
+        btn.textContent = option.label;
+        btn.dataset.value = option.value;
+        Object.assign(btn.style, {
+            fontSize: '13px',
+            padding: '10px 12px',
+            background: getMovementPattern() === option.value
+                ? 'linear-gradient(180deg, #66d96a 0%, #4CAF50 50%, #388E3C 100%)'
+                : 'linear-gradient(180deg, #888 0%, #666 50%, #555 100%)',
+            color: 'white',
+            border: '3px solid ' + (getMovementPattern() === option.value ? '#2E7D32' : '#333'),
+            borderRadius: '12px',
+            cursor: 'pointer',
+            fontWeight: 'bold',
+            boxShadow: '0 3px 0px ' + (getMovementPattern() === option.value ? '#1B5E20' : '#222') + ', 0 4px 10px rgba(0,0,0,0.3)',
+            fontFamily: '"Fredoka", sans-serif',
+            transition: 'all 0.15s ease',
+        });
+
+        btn.onmouseover = () => {
+            btn.style.transform = 'translateY(-2px)';
+        };
+        btn.onmouseout = () => {
+            btn.style.transform = 'translateY(0)';
+        };
+
+        patternButtons[option.value] = btn;
+        patternButtonsContainer.appendChild(btn);
+    });
+
+    patternContainer.appendChild(patternButtonsContainer);
+    settingsPanel.appendChild(patternContainer);
 
     // Buttons container
     const settingsButtonsContainer = document.createElement('div');
@@ -1356,6 +1425,24 @@ export function initUI(container) {
         });
     });
 
+    // Movement pattern button listeners
+    Object.keys(patternButtons).forEach(pattern => {
+        patternButtons[pattern].addEventListener('click', () => {
+            setMovementPattern(pattern);
+
+            // Update button styles
+            Object.keys(patternButtons).forEach(key => {
+                const btn = patternButtons[key];
+                const isActive = key === pattern;
+                btn.style.background = isActive
+                    ? 'linear-gradient(180deg, #66d96a 0%, #4CAF50 50%, #388E3C 100%)'
+                    : 'linear-gradient(180deg, #888 0%, #666 50%, #555 100%)';
+                btn.style.border = '3px solid ' + (isActive ? '#2E7D32' : '#333');
+                btn.style.boxShadow = '0 3px 0px ' + (isActive ? '#1B5E20' : '#222') + ', 0 4px 10px rgba(0,0,0,0.3)';
+            });
+        });
+    });
+
     resetButton.addEventListener('click', () => {
         resetConfig();
         gravitySlider.value = getGravity().toString();
@@ -1368,6 +1455,18 @@ export function initUI(container) {
         Object.keys(spawnButtons).forEach(key => {
             const btn = spawnButtons[key];
             const isActive = key === currentDirection;
+            btn.style.background = isActive
+                ? 'linear-gradient(180deg, #66d96a 0%, #4CAF50 50%, #388E3C 100%)'
+                : 'linear-gradient(180deg, #888 0%, #666 50%, #555 100%)';
+            btn.style.border = '3px solid ' + (isActive ? '#2E7D32' : '#333');
+            btn.style.boxShadow = '0 3px 0px ' + (isActive ? '#1B5E20' : '#222') + ', 0 4px 10px rgba(0,0,0,0.3)';
+        });
+
+        // Reset movement pattern buttons
+        const currentPattern = getMovementPattern();
+        Object.keys(patternButtons).forEach(key => {
+            const btn = patternButtons[key];
+            const isActive = key === currentPattern;
             btn.style.background = isActive
                 ? 'linear-gradient(180deg, #66d96a 0%, #4CAF50 50%, #388E3C 100%)'
                 : 'linear-gradient(180deg, #888 0%, #666 50%, #555 100%)';

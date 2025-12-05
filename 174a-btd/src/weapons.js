@@ -39,7 +39,7 @@ export const WEAPONS = {
         id: 'ICE_KNIVES',
         name: 'Ice Knives',
         damage: 2,
-        fireRate: 0.6,
+        fireRate: 1,
         projectileSpeed: 40,
         projectileColor: 0x87CEEB,
         projectileSize: 0.15,

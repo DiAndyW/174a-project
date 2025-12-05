@@ -4,6 +4,7 @@ let gameConfig = {
     gravity: -9.8,
     balloonSize: 1.0, // Multiplier for balloon radius
     spawnDirection: 'left', // 'left', 'right', or 'random'
+    movementPattern: 'random', // 'random', 'NORMAL', 'ZIGZAG', 'SINE', or 'SPIRAL'
 };
 
 export function getGravity() {
@@ -30,6 +31,14 @@ export function setSpawnDirection(value) {
     gameConfig.spawnDirection = value;
 }
 
+export function getMovementPattern() {
+    return gameConfig.movementPattern;
+}
+
+export function setMovementPattern(value) {
+    gameConfig.movementPattern = value;
+}
+
 export function getConfig() {
     return { ...gameConfig };
 }
@@ -38,4 +47,5 @@ export function resetConfig() {
     gameConfig.gravity = -9.8;
     gameConfig.balloonSize = 1.0;
     gameConfig.spawnDirection = 'left';
+    gameConfig.movementPattern = 'random';
 }
