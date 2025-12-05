@@ -11,11 +11,12 @@ export class TrajectoryPreview {
 
         // Material for dashed line
         this.material = new THREE.LineDashedMaterial({
-            color: 0xffffff,
+            color: 0xff0000, 
             dashSize: 0.5,
             gapSize: 0.2,
-            opacity: 0.5,
-            transparent: true
+            opacity: 0.8,
+            transparent: true,
+            linewidth: 5 
         });
 
         // Geometry buffer
