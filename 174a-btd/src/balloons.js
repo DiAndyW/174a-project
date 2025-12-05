@@ -13,7 +13,8 @@ const PATTERNS = {
     NORMAL: 'NORMAL',
     ZIGZAG: 'ZIGZAG',
     SINE: 'SINE',
-    SPIRAL: 'SPIRAL'
+    SPIRAL: 'SPIRAL',
+    RISE: 'RISE'
 };
 
 // Balloon type definitions (BTD classic hierarchy)
@@ -441,6 +442,9 @@ export function updateBalloons(scene, dt, gravity) {
                 patternY = Math.cos(b.patternState.time * 2) * dt * 2;
                 patternZ = Math.sin(b.patternState.time * 2) * dt * 2;
                 break;
+            case PATTERNS.RISE:
+                patternY = dt * 3; // Slowly rise up
+                break;
             default: // NORMAL
                 patternY = arcOffset * dt; // Original slight bobble
                 break;
@@ -452,8 +456,8 @@ export function updateBalloons(scene, dt, gravity) {
         const x = b.mesh.position.x;
         const y = b.mesh.position.y;
 
-        // remove life if balloon escapes past the floor
-        if (y < -0.5) {
+        // remove life if balloon escapes past the floor or side walls
+        if (y < -0.5 || x > 6 || x < -6) {
             // Count this balloon and all its children as escaped
             const escapeDamage = countBalloonValue(b.type);
             if (onBalloonEscape) onBalloonEscape(escapeDamage);

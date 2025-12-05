@@ -765,8 +765,8 @@ export function initUI(container) {
         borderRadius: '12px',
     });
 
-    const patternOptions = ['random', 'NORMAL', 'ZIGZAG', 'SINE', 'SPIRAL'];
-    const patternLabels = { 'random': 'Random', 'NORMAL': 'Normal', 'ZIGZAG': 'Zigzag', 'SINE': 'Sine', 'SPIRAL': 'Spiral' };
+    const patternOptions = ['random', 'NORMAL', 'ZIGZAG', 'SINE', 'SPIRAL', 'RISE'];
+    const patternLabels = { 'random': 'Random', 'NORMAL': 'Normal', 'ZIGZAG': 'Zigzag', 'SINE': 'Sine', 'SPIRAL': 'Spiral', 'RISE': 'Rise' };
     let currentPatternIndex = patternOptions.indexOf(getMovementPattern());
 
     const patternLeftArrow = document.createElement('button');
