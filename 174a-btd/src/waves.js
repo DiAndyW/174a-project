@@ -11,7 +11,6 @@ let onWaveStart = null;
 let scene = null;
 let isPausedCallback = null;
 
-// Wave definitions - each wave specifies balloon counts
 const WAVE_CONFIGS = [
     // Wave 1: Introduction - just reds
     { 
@@ -31,7 +30,7 @@ const WAVE_CONFIGS = [
     // Wave 3: Greens
     { 
         balloons: [
-            { type: 'BLUE', count: 10 },
+            { type: 'BLUE', count: 7 },
             { type: 'GREEN', count: 5 }
         ],
         spawnDelay: 1200,
@@ -68,7 +67,7 @@ const WAVE_CONFIGS = [
     { 
         balloons: [
             { type: 'GREEN', count: 15 },
-            { type: 'PINK', count: 10 },
+            { type: 'PINK', count: 8 },
             { type: 'BLACK', count: 5 }
         ],
         spawnDelay: 800,
@@ -87,9 +86,9 @@ const WAVE_CONFIGS = [
     // Wave 9: Heavy assault
     { 
         balloons: [
-            { type: 'PINK', count: 20 },
-            { type: 'BLACK', count: 8 },
-            { type: 'WHITE', count: 8 }
+            { type: 'PINK', count: 10 },
+            { type: 'BLACK', count: 5 },
+            { type: 'WHITE', count: 3 }
         ],
         spawnDelay: 700,
         description: 'Heavy Assault'
@@ -97,8 +96,8 @@ const WAVE_CONFIGS = [
     // Wave 10: Lead appears!
     { 
         balloons: [
-            { type: 'BLACK', count: 10 },
-            { type: 'WHITE', count: 10 },
+            { type: 'BLACK', count: 6 },
+            { type: 'WHITE', count: 6 },
             { type: 'LEAD', count: 3 }
         ],
         spawnDelay: 800,
@@ -111,7 +110,6 @@ function generateWave(waveNum) {
     const baseCount = 10 + (waveNum - WAVE_CONFIGS.length) * 5;
     const types = Object.keys(BALLOON_TYPES);
     
-    // Include more difficult balloons as waves progress
     const maxTypeIndex = Math.min(types.length - 1, Math.floor((waveNum - WAVE_CONFIGS.length) / 2) + 6);
     
     const balloons = [];
@@ -151,17 +149,16 @@ export function startNextWave() {
     currentWave++;
     const config = getWaveConfig(currentWave);
     
-    // Count total balloons in wave
     balloonsInWave = config.balloons.reduce((sum, b) => sum + b.count, 0);
     balloonsSpawned = 0;
     waveActive = true;
     
-    // Notify wave start
+
     if (onWaveStart) {
         onWaveStart(currentWave, config.description, balloonsInWave);
     }
     
-    // Create spawn queue (shuffled for variety)
+
     const spawnQueue = [];
     config.balloons.forEach(({ type, count }) => {
         for (let i = 0; i < count; i++) {
@@ -169,18 +166,17 @@ export function startNextWave() {
         }
     });
     
-    // Shuffle the queue
+
     for (let i = spawnQueue.length - 1; i > 0; i--) {
         const j = Math.floor(Math.random() * (i + 1));
         [spawnQueue[i], spawnQueue[j]] = [spawnQueue[j], spawnQueue[i]];
     }
     
-    // Start spawning
+
     let spawnIndex = 0;
     function spawnNext() {
-        // If game is paused, reschedule instead of spawning
         if (isPausedCallback && isPausedCallback()) {
-            spawnTimer = setTimeout(spawnNext, 100); // Check again in 100ms
+            spawnTimer = setTimeout(spawnNext, 100);
             return;
         }
 
@@ -193,14 +189,12 @@ export function startNextWave() {
         }
     }
     
-    // Initial delay before first spawn
     spawnTimer = setTimeout(spawnNext, 1000);
     
     return true;
 }
 
 export function checkWaveComplete() {
-    // Wave is complete when all balloons spawned AND none remain on screen
     if (waveActive && balloonsSpawned >= balloonsInWave && getActiveBalloonCount() === 0) {
         waveActive = false;
         if (onWaveComplete) {

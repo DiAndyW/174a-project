@@ -129,8 +129,10 @@ function animate() {
         // Update trajectory
         trajectoryPreview.update();
 
-        // Update balloon count in UI - show total pops remaining
-        const totalRemaining = getTotalBalloonsRemaining();
+        // Update balloon count in UI - show total remaining in wave (on screen + not yet spawned)
+        const waveProgress = getWaveProgress();
+        const balloonsNotYetSpawned = waveProgress.total - waveProgress.spawned;
+        const totalRemaining = getTotalBalloonsRemaining() + balloonsNotYetSpawned;
         updateBalloonsRemaining(totalRemaining);
 
         const balloons = getBalloons();
