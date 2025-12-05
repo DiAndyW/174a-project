@@ -74,7 +74,7 @@ export function initControls(camera, renderer, onShoot) {
 
     function onMouseDown(event) {
         if (event.button !== 0) return; // Only left click
-        
+
         if (!controls.isLocked) {
             controls.lock();
         } else {
@@ -111,9 +111,24 @@ export function initControls(camera, renderer, onShoot) {
             if (movement.left) controls.moveRight(-actualMove);
             if (movement.right) controls.moveRight(actualMove);
 
-            // Check collision and revert if needed
+            // Calculate desired delta
+            const startPos = prevPosition.clone();
+            const endPos = camera.position.clone();
+            const delta = endPos.sub(startPos);
+
+            // Reset to start
+            camera.position.copy(startPos);
+
+            // Try X movement
+            camera.position.x += delta.x;
             if (checkWallCollision(camera.position)) {
-                camera.position.copy(prevPosition);
+                camera.position.x -= delta.x; // Undo X if hit
+            }
+
+            // Try Z movement
+            camera.position.z += delta.z;
+            if (checkWallCollision(camera.position)) {
+                camera.position.z -= delta.z; // Undo Z if hit
             }
         }
     }
