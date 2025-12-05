@@ -172,7 +172,10 @@ function createBalloonMesh(balloonType, callback) {
 }
 
 export function spawnBalloon(scene, startY = null, balloonTypeId = 'RED', position = null) {
-    const yPos = startY !== null ? startY : 0.5 + Math.random() * 4;
+    // Spawn at one of the two hole heights (2 or 4.5) with slight variation
+    const spawnHeights = [2, 4.5];
+    const chosenHeight = spawnHeights[Math.floor(Math.random() * spawnHeights.length)];
+    const yPos = startY !== null ? startY : chosenHeight + (Math.random() - 0.5) * 0.3;
     const balloonType = BALLOON_TYPES[balloonTypeId] || BALLOON_TYPES.RED;
 
     // Show spawn warning UI (only for non-child balloons)
