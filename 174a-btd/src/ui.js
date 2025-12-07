@@ -2,19 +2,21 @@
 import { WEAPONS, setCurrentWeapon, getCurrentWeapon } from './weapons.js';
 import { loadWeaponModel } from './objects.js';
 import { getGravity, setGravity, getBalloonSize, setBalloonSize, getSpawnDirection, setSpawnDirection, getMovementPattern, setMovementPattern, getBaseSpeed, setBaseSpeed, resetConfig } from './config.js';
+import { audioManager } from './audio.js';
 
 export function initUI(container) {
     let score = 0;
     let highScore = parseInt(localStorage.getItem('btd-highscore') || '0');
     let combo = 0;
     let multiplier = 1;
-    let lives = 50;
+    let lives = 10;
     let gameStarted = false;
     let gamePaused = false;
     let lastHitTime = 0;
     const COMBO_WINDOW = 3000; // 3 seconds
     let currentWaveNum = 0;
     let balloonsRemaining = 0;
+    let lowLivesWarningPlayed = false; // Track if low lives warning has been played
 
     // Add Google Font
     const fontLink = document.createElement('link');
@@ -1290,7 +1292,7 @@ export function initUI(container) {
         combo = 0;
         currentWaveNum = 0;
         multiplier = 1;
-        lives = 50;
+        lives = 10;
         updateScore();
         updateWaveDisplay();
         updateLives();
@@ -1374,7 +1376,7 @@ export function initUI(container) {
 
     function updateLives() {
         livesDiv.innerHTML = `❤️ Lives: <span style="color: #fff;">${lives}</span>`;
-        if (lives <= 10) {
+        if (lives <= 5) {
             livesDiv.style.animation = 'pulse 0.5s infinite';
             livesDiv.style.color = '#ff4444';
         }
@@ -1383,10 +1385,30 @@ export function initUI(container) {
     function loseLife(damage = 1) {
         lives -= damage;
         updateLives();
+
+        // Play lose life sound
+        audioManager.playLoseLife();
+
+        // Play low lives warning sound when dropping below 5 lives (only once)
+        if (lives <= 5 && lives > 0 && !lowLivesWarningPlayed) {
+            lowLivesWarningPlayed = true;
+            audioManager.playLowLives();
+        }
+
         if (lives <= 0) {
             gameOver();
         }
         showLifeLostWarning();
+    }
+
+    function addLives(amount = 1) {
+        lives += amount;
+        updateLives();
+
+        // Reset low lives warning flag if we're above 5 lives now
+        if (lives > 5) {
+            lowLivesWarningPlayed = false;
+        }
     }
 
     function showLifeLostWarning() {
@@ -1432,6 +1454,10 @@ export function initUI(container) {
 
     function gameOver() {
         gameStarted = false;
+
+        // Play game over sound
+        audioManager.playGameOver();
+
         hudContainer.style.display = 'none';
         crosshair.style.display = 'none';
         gameOverScreen.style.display = 'flex';
@@ -1614,6 +1640,9 @@ export function initUI(container) {
         currentWaveNum = waveNum;
         updateWaveDisplay();
 
+        // Play new wave sound
+        audioManager.playNewWave();
+
         const notification = document.createElement('div');
         notification.innerHTML = `
             <div style="font-size: 52px; margin-bottom: 10px; font-family: 'Bangers', 'Arial Black', sans-serif; letter-spacing: 3px;"> WAVE ${waveNum}</div>
@@ -1711,6 +1740,7 @@ export function initUI(container) {
         getScore: () => score,
         addScore,
         loseLife,
+        addLives,
         showSpawnWarning,
         isGameStarted: () => gameStarted,
         isGamePaused: () => gamePaused,

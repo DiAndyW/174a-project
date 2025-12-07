@@ -2,6 +2,7 @@
 import * as THREE from 'three';
 import { OBJLoader } from 'three/addons/loaders/OBJLoader.js';
 import { getCurrentWeapon } from './weapons.js';
+import { audioManager } from './audio.js';
 
 const projectiles = [];
 const raycaster = new THREE.Raycaster();
@@ -11,6 +12,11 @@ export function shootProjectile(scene, camera) {
     const weapon = getCurrentWeapon();
     const origin = new THREE.Vector3();
     const dir = new THREE.Vector3();
+
+    // Play weapon-specific sound
+    if (weapon.soundName) {
+        audioManager.playWeapon(weapon.soundName);
+    }
 
     // Bullet initial position + direction
     camera.getWorldPosition(origin);

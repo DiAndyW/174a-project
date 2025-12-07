@@ -5,7 +5,7 @@ export const WEAPONS = {
         id: 'HAND_GUN',
         name: 'Hand Gun',
         damage: 1,
-        fireRate: 0.3,      
+        fireRate: 0.3,
         projectileSpeed: 50,
         projectileColor: 0x000000,
         projectileSize: 0.1,
@@ -15,7 +15,8 @@ export const WEAPONS = {
         modelPosition: { x: 0.15, y: -0.3, z: -0.62 },
         modelRotation: { x: 0, y: Math.PI * 3 / 2, z: 0 },
         modelMaterial: { color: 0xb35432, type: 'phong' },
-        projectileType: 'sphere'  // Use sphere projectile
+        projectileType: 'sphere',  // Use sphere projectile
+        soundName: 'hand_gun'  
     },
     MACHINE_GUN: {
         id: 'MACHINE_GUN',
@@ -33,7 +34,8 @@ export const WEAPONS = {
         modelPosition: { x: 0.25, y: -0.2, z: -0.2 },
         modelRotation: { x: 0, y: Math.PI * 25/16, z: Math.PI / 2 },
         modelMaterial: { color: 0xb35432, type: 'phong' },
-        projectileType: 'sphere'  // Use sphere projectile
+        projectileType: 'sphere',  // Use sphere projectile
+        soundName: 'machine_gun'  
     },
     ICE_KNIVES: {
         id: 'ICE_KNIVES',
@@ -70,7 +72,8 @@ export const WEAPONS = {
             opacity: 0.9,
             emissive: 0x0088FF,
             emissiveIntensity: 0.3
-        }
+        },
+        soundName: 'ice_knives'  
     },
     RAY_GUN: {
         id: 'RAY_GUN',
@@ -85,8 +88,8 @@ export const WEAPONS = {
         modelScale: { x: 0.1, y: 0.1, z: 0.1 },
         modelPosition: { x: 0.15, y: -0.3, z: -0.62 },
         modelRotation: { x: 0, y: Math.PI * 3 / 2, z: 0 },
-        modelMaterial: { 
-            color: 0xa181eb, 
+        modelMaterial: {
+            color: 0xa181eb,
             type: 'standard',
             metalness: 2,
             roughness: 0.2,
@@ -101,7 +104,8 @@ export const WEAPONS = {
             emissiveIntensity: 1.0,
             transparent: true,
             opacity: 1
-        }
+        },
+        soundName: 'ray_gun'  
     }
 };
 

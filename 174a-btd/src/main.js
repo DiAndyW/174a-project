@@ -12,6 +12,7 @@ import { updateParticles, createExplosion, createSparkles } from './particles.js
 import { initWaves, startNextWave, checkWaveComplete, getWaveProgress, isWaveActive } from './waves.js';
 import { TrajectoryPreview } from './trajectory.js';
 import { getGravity } from './config.js';
+import { audioManager } from './audio.js';
 
 // Root container
 const root = document.getElementById('root');
@@ -32,8 +33,12 @@ root.appendChild(container);
 
 // Initialize all modules
 const { scene, camera, renderer, cleanup: sceneCleanup } = initScene(container);
+
+// Initialize audio system
+audioManager.init(camera);
+
 const ui = initUI(container);
-const { addScore, loseLife, showSpawnWarning, isGameStarted, isGamePaused, showWaveStart, updateBalloonsRemaining, updateComboTimer, showGraffitiText } = ui;
+const { addScore, loseLife, addLives, showSpawnWarning, isGameStarted, isGamePaused, showWaveStart, updateBalloonsRemaining, updateComboTimer, showGraffitiText } = ui;
 const { checkWallCollision } = initWalls(scene);
 const { updateMovement, cleanup: controlsCleanup } = initControls(
     camera,
@@ -54,9 +59,12 @@ initWaves(
     },
     // On wave complete - auto-start next wave after delay
     (waveNum) => {
+        // Reward player with 2 lives for completing the wave
+        addLives(2);
+
         setTimeout(() => {
             startNextWave();
-        }, 2000); // 2 second break between waves
+        }, 3000); // 3 second break between waves
     },
     // Pass isPaused callback so wave system can check pause state
     isGamePaused
@@ -178,6 +186,9 @@ function animate() {
                     removeProjectile(scene, j);
 
                     if (result.popped) {
+                        // Play balloon pop sound
+                        audioManager.playBalloonPop();
+
                         // Award points based on balloon type
                         const { combo } = addScore(result.points);
 
@@ -191,6 +202,11 @@ function animate() {
                                 // Sparkles on every 5th hit
                                 if (combo % 5 === 0) {
                                     createSparkles(scene, result.position, 0xffd700, 15);
+                                }
+
+                                // High combo sound on every 10th hit
+                                if (combo % 10 === 0) {
+                                    audioManager.playHighCombo();
                                 }
                             }
                         }
